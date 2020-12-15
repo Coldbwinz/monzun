@@ -1,0 +1,15 @@
+language: java
+jdk:
+- openjdk8
+services:
+- postgresql
+addons:
+  postgresql: '10'
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
+before_script:
+- psql --command="CREATE USER dev"
+- psql --command="CREATE DATABASE monzun_testing WITH OWNER = dev";
+script: "./mvnw clean install"
