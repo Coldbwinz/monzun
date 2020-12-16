@@ -76,6 +76,10 @@ public class LoginController extends BaseRestController {
         User user = possibleUser.get();
         List<Role> availableRoles = Arrays.asList(RoleEnum.STARTUP.getRole(), RoleEnum.TRACKER.getRole());
         if (!availableRoles.contains(user.getRole())) {
+            if (user.isBlocked()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(this.getErrorMessage("block_reason", user.getBlockReason()));
+            }
             return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
         }
 

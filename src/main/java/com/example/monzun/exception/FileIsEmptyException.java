@@ -2,9 +2,9 @@ package com.example.monzun.exception;
 
 import javax.persistence.EntityNotFoundException;
 
-public class UserByEmailNotFound extends EntityNotFoundException {
+public class FileIsEmptyException extends IllegalStateException {
 
-    public UserByEmailNotFound(String msg) {
+    public FileIsEmptyException(String msg) {
         super(msg);
     }
 }
