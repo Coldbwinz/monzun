@@ -2,6 +2,9 @@ package com.example.monzun.enums;
 
 import com.example.monzun.entities.Role;
 
+/**
+ * Роли в системе
+ */
 public enum RoleEnum {
     ADMIN(new Role(1, "admin", "Администратор")),
     STARTUP(new Role(2, "startup", "Участник")),

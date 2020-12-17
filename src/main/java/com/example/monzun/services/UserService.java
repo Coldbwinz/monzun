@@ -7,7 +7,6 @@ import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.MeRequest;
 import org.modelmapper.ModelMapper;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -79,6 +78,11 @@ public class UserService {
         userRepository.saveAndFlush(user);
     }
 
+    /**
+     * Получение пользователя по ID
+     * @param id User id
+     * @return User
+     */
     private User getUser(Long id) {
         Optional<User> possibleUser = userRepository.findById(id);
         if (!possibleUser.isPresent()) {
@@ -88,6 +92,11 @@ public class UserService {
         return possibleUser.get();
     }
 
+    /**
+     * Преобразование в список DTOs
+     * @param user User пользователь
+     * @return UserListDTO
+     */
     private UserListDTO convertToDto(User user) {
         return modelMapper.map(user, UserListDTO.class);
     }

@@ -14,6 +14,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Конфигуратор для доступа к роутам с учетом авторизации через JWT
+ */
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 

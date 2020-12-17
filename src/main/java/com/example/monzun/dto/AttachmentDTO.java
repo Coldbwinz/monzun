@@ -13,8 +13,9 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class AttachmentDTO {
+    private Long id;
     private UUID uuid;
-    private String fileName;
+    private String filename;
     private String url;
     private String originalFilename;
     private String path;
@@ -23,9 +24,10 @@ public class AttachmentDTO {
     private LocalDateTime createdAt;
 
     public AttachmentDTO(Attachment attachment) {
+        this.id = attachment.getId();
         this.uuid = attachment.getUuid();
         this.url = attachment.getUrl();
-        this.fileName = attachment.getFilename();
+        this.filename = attachment.getFilename();
         this.originalFilename = attachment.getOriginalFilename();
         this.path = attachment.getPath();
         this.owner = new UserListDTO(attachment.getOwner());

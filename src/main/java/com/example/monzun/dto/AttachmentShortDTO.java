@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class AttachmentShortDTO {
+    private Long id;
     private UUID uuid;
     private String url;
     private String originalFilename;
@@ -20,6 +21,7 @@ public class AttachmentShortDTO {
     private LocalDateTime createdAt;
 
     public AttachmentShortDTO(Attachment attachment) {
+        this.id = attachment.getId();
         this.uuid = attachment.getUuid();
         this.url = attachment.getUrl();
         this.originalFilename = attachment.getOriginalFilename();

@@ -30,6 +30,10 @@ public class Attachment {
     private User owner;
     @Column(name = "filename", nullable = false)
     private String filename;
+    @Column(name = "polytable_type")
+    private String polytableType;
+    @Column(name = "polytable_id", insertable = false, updatable = false)
+    private Long polytableId;
     @Column(name = "original_filename")
     private String originalFilename;
     @Column(name = "path", nullable = false)

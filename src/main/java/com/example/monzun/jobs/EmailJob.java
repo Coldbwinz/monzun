@@ -8,6 +8,9 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.mail.MessagingException;
 
+/**
+ * Отправка почты через очередь
+ */
 public class EmailJob extends QuartzJobBean {
     private final EmailService service;
 
