@@ -1,0 +1,1 @@
+ALTER TABLE tracking_requests ADD CONSTRAINT unique_tracking_startups UNIQUE (startup_id, tracking_id);

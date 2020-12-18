@@ -3,6 +3,7 @@ package com.example.monzun.controllers;
 import com.example.monzun.dto.UserDTO;
 import com.example.monzun.entities.Mail;
 import com.example.monzun.entities.User;
+import com.example.monzun.exception.NoAuthUserException;
 import com.example.monzun.exception.UserByEmailNotFoundException;
 import com.example.monzun.repositories.PasswordResetTokenRepository;
 import com.example.monzun.repositories.UserRepository;
@@ -14,7 +15,6 @@ import com.example.monzun.services.UserService;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -56,26 +56,33 @@ public class MeController extends BaseRestController {
         this.userService = userService;
     }
 
-
+    /**
+     * Просмотр авторизованного пользователя
+     * @return JSON
+     */
     @GetMapping()
     public ResponseEntity<?> me() {
-        Optional<User> user = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        return user.isPresent()
-                ? ResponseEntity.ok(new UserDTO(user.get()))
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(this.getFalseResponse());
+        try {
+            return ResponseEntity.ok(new UserDTO(this.getAuthUser()));
+        } catch (NoAuthUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
+    /**
+     * Редактирование авторизованного пользователя
+     * @param request MeRequest
+     * @return JSON
+     */
     @PutMapping()
     public ResponseEntity<?> editMe(@Valid MeRequest request) {
-        Optional<User> user = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (!user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(this.getFalseResponse());
+        try {
+            User updatedUser = userService.update(getAuthUser().getId(), request);
+
+            return ResponseEntity.ok(new UserDTO(updatedUser));
+        } catch (NoAuthUserException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
-        User updatedUser = userService.update(user.get().getId(), request);
-
-        return ResponseEntity.ok(new UserDTO(updatedUser));
     }
 
     /**
@@ -139,16 +146,16 @@ public class MeController extends BaseRestController {
         boolean result = passwordResetTokenService.isValidPasswordResetToken(passwordChangeRequest.getToken());
 
         if (!result) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(this.getFalseResponse());
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
 
         Long userId = passwordResetTokenRepository.findByToken(passwordChangeRequest.getToken()).getUser().getId();
 
         if (userId != null) {
             userService.changePassword(userId, passwordChangeRequest.getNewPassword());
-            return ResponseEntity.status(HttpStatus.OK).body(this.getFalseResponse());
+            return ResponseEntity.status(HttpStatus.OK).build();
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(this.getFalseResponse());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }

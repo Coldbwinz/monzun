@@ -1,11 +1,18 @@
 package com.example.monzun.services;
 
+import com.example.monzun.dto.AttachmentDTO;
+import com.example.monzun.dto.AttachmentShortDTO;
 import com.example.monzun.entities.Attachment;
+import com.example.monzun.entities.Startup;
 import com.example.monzun.entities.User;
+import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import com.example.monzun.exception.FileIsEmptyException;
 import com.example.monzun.exception.UserByEmailNotFoundException;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.UserRepository;
+import net.bytebuddy.utility.RandomString;
+import org.apache.commons.io.FilenameUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,37 +28,72 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
-    public AttachmentService(AttachmentRepository attachmentRepository, UserRepository userRepository) {
+    public AttachmentService(
+            AttachmentRepository attachmentRepository,
+            UserRepository userRepository,
+            ModelMapper modelMapper
+    ) {
         this.attachmentRepository = attachmentRepository;
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     private final String UPLOAD_PATH = System.getProperty("user.dir") + "/attachments/";
 
     /**
-     * Хранение файлы и создание записи в БД
+     * Список DTO
+     *
+     * @param attachments список моделей для конвертирования в DTO
+     * @return List<AttachmentDTO>
+     */
+    public List<AttachmentDTO> getAttachmentsDTO(List<Attachment> attachments) {
+        return attachments.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Множественное сохранение файлов
+     *
+     * @param files files
+     * @return List<Attachment>
+     * @throws IOException IOException
+     */
+    public List<Attachment> storeFiles(MultipartFile[] files) throws IOException {
+        List<Attachment> attachments = new ArrayList<>();
+        for (MultipartFile file : files) {
+            attachments.add(storeFile(file));
+        }
+
+        return attachments;
+    }
+
+    /**
+     * Хранение файла и создание записи в БД
      *
      * @param file file
      * @return Attachment файл
      * @throws IOException IOException
      */
-    public Attachment storeFile(MultipartFile file) throws IOException {
+    private Attachment storeFile(MultipartFile file) throws IOException {
         Attachment attachment;
         if (file.isEmpty()) {
             throw new FileIsEmptyException("File is empty " + file.getName());
         }
 
-        attachment = this.saveAttachment(file);
-        saveFile(file);
+        Path savedFile = saveFile(file);
+        attachment = this.saveAttachment(savedFile, file.getOriginalFilename());
 
         return attachment;
     }
@@ -98,14 +141,49 @@ public class AttachmentService {
     }
 
     /**
+     * Обновление polytable type + polytable id для прикрепленных файлов стартапа
+     *
+     * @param startup     стартап
+     * @param attachments прикрепленные файлы
+     */
+    public void saveStartupFiles(Startup startup, List<Attachment> attachments) {
+        attachments.forEach(attachment -> {
+            attachment.setPolytableId(startup.getId());
+            attachment.setPolytableType(AttachmentPolytableTypeConstants.STARTUP.getType());
+            attachmentRepository.save(attachment);
+        });
+    }
+
+    /**
+     * Преобразование модели в DTO
+     *
+     * @param attachment прикрепляемый файл
+     * @return AttachmentDTO
+     */
+    public AttachmentDTO convertToDto(Attachment attachment) {
+        return modelMapper.map(attachment, AttachmentDTO.class);
+    }
+
+    /**
+     * Преобразование модели в Short DTO
+     *
+     * @param attachment прикрепляемый файл
+     * @return AttachmentDTO
+     */
+    public AttachmentShortDTO convertToShortDto(Attachment attachment) {
+        return modelMapper.map(attachment, AttachmentShortDTO.class);
+    }
+
+    /**
      * Физическое сохранение файла
      *
      * @param file файл
+     * @return Path Сохраненный файл
      * @throws IOException IOException
      */
-    private void saveFile(MultipartFile file) throws IOException {
-        Path path = Paths.get(UPLOAD_PATH + file.getOriginalFilename());
-        Files.write(path, file.getBytes());
+    private Path saveFile(MultipartFile file) throws IOException {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        return Files.write(Paths.get(UPLOAD_PATH + RandomString.make(10) + "." + extension), file.getBytes());
     }
 
 
@@ -115,7 +193,7 @@ public class AttachmentService {
      * @param file файл
      * @return Attachment
      */
-    private Attachment saveAttachment(MultipartFile file) {
+    private Attachment saveAttachment(Path file, @Nullable String fileName) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> owner = userRepository.findByEmail(email);
 
@@ -127,11 +205,10 @@ public class AttachmentService {
         Attachment attachment = new Attachment();
 
         attachment.setUrl(baseURL + "/api/attachment/download/" + attachment.getUuid());
-        attachment.setFilename(file.getName());
-        attachment.setOriginalFilename(file.getOriginalFilename());
-        attachment.setPath(UPLOAD_PATH + file.getOriginalFilename());
+        attachment.setOriginalFilename(fileName != null ? fileName : file.toFile().getName());
+        attachment.setFilename(file.toFile().getName());
+        attachment.setPath(file.toFile().getAbsolutePath());
         attachment.setOwner(owner.get());
-        attachment.setFilename(file.getName());
         attachment.setCreatedAt(LocalDateTime.now());
         attachmentRepository.save(attachment);
 

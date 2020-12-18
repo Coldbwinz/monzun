@@ -1,20 +1,41 @@
 package com.example.monzun.controllers;
 
+import com.example.monzun.entities.User;
+import com.example.monzun.exception.NoAuthUserException;
+import com.example.monzun.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Базовый класс для REST контроллера.
  */
 public abstract class BaseRestController {
-    /**
-     * @return Структура успешного запроса (success:true)
-     */
-    protected Map<String, Boolean> getFalseResponse() {
-        Map<String, Boolean> successFalse = new HashMap<>();
-        successFalse.put("success", false);
 
-        return successFalse;
+    @Autowired
+    private UserRepository userRepository;
+
+    /**
+     * Получение текущего авторизованного пользователя
+     * @return User авториванный пользователь
+     * @throws NoAuthUserException NoAuthUserException
+     */
+    protected User getAuthUser() throws NoAuthUserException {
+        Optional<User> possibleUser = userRepository.findByEmail(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+
+        if (!possibleUser.isPresent()) {
+            throw new NoAuthUserException();
+        }
+
+        return possibleUser.get();
     }
 
     /**

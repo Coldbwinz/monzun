@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,15 +29,15 @@ public class AttachmentController extends BaseRestController {
     }
 
     /**
-     * Загрузка файла.
+     * Загрузка файлов.
      *
-     * @param file MultipartFile file
+     * @param files MultipartFile[] file
      * @return JSON-структура загруженного файла
      * @throws IOException IOException
      */
     @PostMapping("/upload")
-    public AttachmentDTO upload(@RequestParam("file") MultipartFile file) throws IOException {
-        return new AttachmentDTO(attachmentService.storeFile(file));
+    public List<AttachmentDTO> upload(@RequestParam("files") MultipartFile[] files) throws IOException {
+        return attachmentService.getAttachmentsDTO(attachmentService.storeFiles(files));
     }
 
     /**
@@ -57,7 +58,7 @@ public class AttachmentController extends BaseRestController {
     ) throws IOException {
         UUID uuidFromString = UUID.fromString(uuid);
         if (!attachmentRepository.existsAllByUuid(uuidFromString)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(this.getFalseResponse());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         Resource resource = attachmentService.download(uuidFromString);
@@ -82,6 +83,6 @@ public class AttachmentController extends BaseRestController {
     public ResponseEntity<?> delete(@PathVariable String uuid) throws IOException {
         return attachmentService.delete(UUID.fromString(uuid))
                 ? ResponseEntity.status(HttpStatus.OK).body(this.getTrueResponse())
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(this.getFalseResponse());
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

@@ -1,11 +1,8 @@
 package com.example.monzun.services;
 
-import com.example.monzun.dto.UserListDTO;
 import com.example.monzun.entities.PasswordResetToken;
 import com.example.monzun.entities.User;
 import com.example.monzun.repositories.PasswordResetTokenRepository;
-import com.example.monzun.repositories.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
