@@ -19,7 +19,7 @@ public class TrackingDTO  {
     private AttachmentShortDTO logo;
     private String name;
     private String description;
-    private boolean isActive;
+    private boolean active;
     private List<StartupListDTO> startups;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date startedAt;

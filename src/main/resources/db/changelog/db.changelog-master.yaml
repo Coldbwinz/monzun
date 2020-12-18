@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.1
+      author: dev
+  - includeAll:
+      path: classpath*:db/changelog/migrations
+      errorIfMissingOrEmpty: false

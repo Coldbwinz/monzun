@@ -32,7 +32,8 @@ public class Tracking {
     @JoinColumn(name = "logo_id", referencedColumnName = "attachment_id")
     private Attachment logo;
     private String description;
-    private boolean isActive;
+    @Column(name = "is_active")
+    private boolean active;
     @Column(name = "started_at")
     private Date startedAt;
     @Column(name = "ended_at", nullable = false)

@@ -1,6 +1,5 @@
 package com.example.monzun.entities;
 
-import com.example.monzun.dto.AttachmentDTO;
 import com.example.monzun.dto.AttachmentShortDTO;
 import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import lombok.AllArgsConstructor;

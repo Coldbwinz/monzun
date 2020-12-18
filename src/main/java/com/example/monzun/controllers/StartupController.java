@@ -3,8 +3,8 @@ package com.example.monzun.controllers;
 
 import com.example.monzun.dto.StartupDTO;
 import com.example.monzun.exception.NoAuthUserException;
+import com.example.monzun.exception.StartupAccessNotAllowedException;
 import com.example.monzun.exception.StartupCreateNotAllowedException;
-import com.example.monzun.exception.StartupShowNotAllowedException;
 import com.example.monzun.requests.StartupRequest;
 import com.example.monzun.services.StartupService;
 import org.springframework.http.HttpStatus;
@@ -54,7 +54,7 @@ public class StartupController extends BaseRestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (StartupShowNotAllowedException e) {
+        } catch (StartupAccessNotAllowedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     this.getErrorMessage("startup", "This startup not allowed for this user"));
         }

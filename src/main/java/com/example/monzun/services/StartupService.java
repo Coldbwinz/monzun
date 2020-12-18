@@ -7,9 +7,8 @@ import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.Startup;
 import com.example.monzun.entities.User;
 import com.example.monzun.enums.RoleEnum;
+import com.example.monzun.exception.StartupAccessNotAllowedException;
 import com.example.monzun.exception.StartupCreateNotAllowedException;
-import com.example.monzun.exception.StartupShowNotAllowedException;
-import com.example.monzun.exception.StartupUpdateNotAllowedException;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.StartupRepository;
 import com.example.monzun.requests.StartupRequest;
@@ -35,7 +34,6 @@ public class StartupService {
     private final StartupRepository startupRepository;
     private final AttachmentRepository attachmentRepository;
     private final AttachmentService attachmentService;
-    private final PlatformTransactionManager transactionManager;
     private final TransactionTemplate transactionTemplate;
 
     public StartupService(
@@ -49,7 +47,6 @@ public class StartupService {
         this.startupRepository = startupRepository;
         this.attachmentRepository = attachmentRepository;
         this.attachmentService = attachmentService;
-        this.transactionManager = transactionManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
@@ -86,9 +83,9 @@ public class StartupService {
      * @param user Пользователь
      * @return StartupDTO
      * @throws EntityNotFoundException не найден стартап
-     * @throws StartupShowNotAllowedException просмотр запрещен
+     * @throws StartupAccessNotAllowedException просмотр запрещен
      */
-    public StartupDTO getStartup(Long id, User user) throws EntityNotFoundException, StartupShowNotAllowedException {
+    public StartupDTO getStartup(Long id, User user) throws EntityNotFoundException, StartupAccessNotAllowedException {
         Optional<Startup> possibleStartup = startupRepository.findById(id);
 
         if (!possibleStartup.isPresent()) {
@@ -98,14 +95,14 @@ public class StartupService {
         Startup startup = possibleStartup.get();
         if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
             if (!startup.getOwner().equals(user)) {
-                throw new StartupShowNotAllowedException(startup, user);
+                throw new StartupAccessNotAllowedException(startup, user);
             }
         } else if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
             if (!startupRepository.getStartupTrackers(startup).contains(user)) {
-                throw new StartupShowNotAllowedException(startup, user);
+                throw new StartupAccessNotAllowedException(startup, user);
             }
         } else {
-            throw new StartupShowNotAllowedException(startup, user);
+            throw new StartupAccessNotAllowedException(startup, user);
         }
 
         startup.setAttachmentsDTO(getStartupAttachmentDTOs(startup));
@@ -127,7 +124,7 @@ public class StartupService {
     }
 
     /**
-     * Cоздание стартапа. Допускается только для участников.
+     * Создание стартапа. Допускается только для участников.
      * @param request параметры стартапа
      * @param owner пользователь, который выполняет действие
      * @return Startup
@@ -138,10 +135,8 @@ public class StartupService {
         }
 
         Startup startup = new Startup();
-        //TODO: Заявки на набор - список набором кроме тех в которых состоит стартап
-        //TODO: в админке продумать как будут выводиться файлы стартапа
 
-        if (request.getLogoId() != null) {
+        if (request.getLogoId() != null && attachmentRepository.findById(request.getLogoId()).isPresent()) {
             startup.setLogo(attachmentRepository.findById(request.getLogoId()).get());
         }
 
@@ -178,10 +173,10 @@ public class StartupService {
         Startup startup = possibleStartup.get();
 
         if (!startup.getOwner().equals(user)) {
-            throw new StartupUpdateNotAllowedException(startup, user);
+            throw new StartupAccessNotAllowedException(startup, user);
         }
 
-        if (request.getLogoId() != null) {
+        if (request.getLogoId() != null && attachmentRepository.findById(request.getLogoId()).isPresent()) {
             startup.setLogo(attachmentRepository.findById(request.getLogoId()).get());
         }
 
