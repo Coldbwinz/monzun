@@ -18,7 +18,6 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -45,6 +44,7 @@ public class TrackingRequestService {
 
     /**
      * Список наборов
+     *
      * @param user Пользователь, который запрашивает список
      * @return List<TrackingListDTO>
      */
@@ -53,16 +53,15 @@ public class TrackingRequestService {
             throw new TrackingForRequestListAccessException("Access denied for trackings to requests");
         }
 
-        Optional<Startup> possibleStartup = startupRepository.findByOwner(user);
-        if (!possibleStartup.isPresent()) {
-            throw new TrackingForRequestListAccessException("Not found your startup");
-        }
+        Startup startup = startupRepository.findByOwner(user)
+                .orElseThrow(() -> new TrackingForRequestListAccessException("Not found your startup"));
 
         //Убираем из списка наборов, те на которые уже подписались
         List<Tracking> trackingsFromRequests = trackingRequestRepository
-                .findByStartup(possibleStartup.get())
+                .findByStartup(startup)
                 .stream()
-                .map(TrackingRequest::getTracking).collect(Collectors.toList());
+                .map(TrackingRequest::getTracking)
+                .collect(Collectors.toList());
 
         List<Tracking> trackings = trackingRepository.findByActiveTrueAndStartedAtAfter(new Date());
         trackings.removeAll(trackingsFromRequests);
@@ -116,12 +115,10 @@ public class TrackingRequestService {
         }
 
         Tracking tracking = checkPresenceAndGetTracking(trackingId);
-        Optional<TrackingRequest> possibleRequest = trackingRequestRepository.findByStartupAndTracking(startup, tracking);
-        if (!possibleRequest.isPresent()) {
-            throw new EntityNotFoundException("Tracking request not found");
-        }
+        TrackingRequest request = trackingRequestRepository.findByStartupAndTracking(startup, tracking)
+                .orElseThrow(() -> new EntityNotFoundException("Tracking request not found"));
 
-        trackingRequestRepository.delete(possibleRequest.get());
+        trackingRequestRepository.delete(request);
     }
 
     /**
@@ -131,12 +128,8 @@ public class TrackingRequestService {
      * @return Startup стартап
      */
     private Startup checkPresenceAndGetStartup(Long startupId) {
-        Optional<Startup> possibleStartup = startupRepository.findById(startupId);
-        if (!possibleStartup.isPresent()) {
-            throw new EntityNotFoundException("Startup not found with id " + startupId);
-        }
-
-        return possibleStartup.get();
+        return startupRepository.findById(startupId)
+                .orElseThrow(() -> new EntityNotFoundException("Startup not found with id " + startupId));
     }
 
     /**
@@ -146,11 +139,7 @@ public class TrackingRequestService {
      * @return Tracking набор
      */
     private Tracking checkPresenceAndGetTracking(Long trackingId) {
-        Optional<Tracking> possibleTracking = trackingRepository.findById(trackingId);
-        if (!possibleTracking.isPresent()) {
-            throw new EntityNotFoundException("Tracking not found with id " + trackingId);
-        }
-
-        return possibleTracking.get();
+        return trackingRepository.findById(trackingId)
+                .orElseThrow(() -> new EntityNotFoundException("Tracking not found with id " + trackingId));
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -70,12 +69,8 @@ public class TrackingService {
      * @throws TrackingAccessNotAllowedException TrackingAccessNotAllowedException
      */
     public TrackingDTO getTracking(Long id, User user) throws EntityNotFoundException, TrackingAccessNotAllowedException {
-        Optional<Tracking> possibleTracking = trackingRepository.findById(id);
-        if (!possibleTracking.isPresent()) {
-            throw new EntityNotFoundException("Tracking not found id " + id);
-        }
-
-        Tracking tracking = possibleTracking.get();
+        Tracking tracking = trackingRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + id));
 
         if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
             if (!trackingRepository.getStartupTrackings(user).contains(tracking)) {

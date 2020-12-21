@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,14 @@ public class Tracking {
             inverseJoinColumns = @JoinColumn(name = "startup_id"))
     private List<Startup> startups;
 
+    /**
+     * Получить текущую неделю набора
+     *
+     * @return int
+     */
+    public int getCurrentWeek() {
+        return (int) (ChronoUnit.DAYS.between(startedAt.toInstant(), LocalDateTime.now()) / 7.0);
+    }
 
     @Override
     public boolean equals(Object o) {

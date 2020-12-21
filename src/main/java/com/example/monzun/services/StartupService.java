@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -53,6 +52,7 @@ public class StartupService {
 
     /**
      * Получение списка стартапов с обработкой разрешения на данное действие.
+     *
      * @param user Пользователь, совершающий действие
      * @return List
      */
@@ -79,20 +79,15 @@ public class StartupService {
      * Если пользователь - участник, то он может обращаться только к своему стартапу.
      * Если пользователь - трекер, то он может обращаться только к тем стартапам, к которым он прикреплен
      *
-     * @param id Startup ID
+     * @param id   Startup ID
      * @param user Пользователь
      * @return StartupDTO
-     * @throws EntityNotFoundException не найден стартап
+     * @throws EntityNotFoundException          не найден стартап
      * @throws StartupAccessNotAllowedException просмотр запрещен
      */
     public StartupDTO getStartup(Long id, User user) throws EntityNotFoundException, StartupAccessNotAllowedException {
-        Optional<Startup> possibleStartup = startupRepository.findById(id);
+        Startup startup = startupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
-        if (!possibleStartup.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        Startup startup = possibleStartup.get();
         if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
             if (!startup.getOwner().equals(user)) {
                 throw new StartupAccessNotAllowedException(startup, user);
@@ -112,6 +107,7 @@ public class StartupService {
 
     /**
      * Получение списка прикрепленных файлов стартапа
+     *
      * @param startup стартап
      * @return List
      */
@@ -125,8 +121,9 @@ public class StartupService {
 
     /**
      * Создание стартапа. Допускается только для участников.
+     *
      * @param request параметры стартапа
-     * @param owner пользователь, который выполняет действие
+     * @param owner   пользователь, который выполняет действие
      * @return Startup
      */
     public Startup create(StartupRequest request, User owner) {
@@ -158,19 +155,15 @@ public class StartupService {
 
     /**
      * Редактирование стартапа
-     * @param id Startup ID
+     *
+     * @param id      Startup ID
      * @param request StartupRequest
-     * @param user Пользователь, который выполняет действие
+     * @param user    Пользователь, который выполняет действие
      * @return Startup
      * @throws EntityNotFoundException EntityNotFoundException
      */
     public Startup update(Long id, StartupRequest request, User user) throws EntityNotFoundException {
-        Optional<Startup> possibleStartup = startupRepository.findById(id);
-        if (!possibleStartup.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        Startup startup = possibleStartup.get();
+        Startup startup = startupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         if (!startup.getOwner().equals(user)) {
             throw new StartupAccessNotAllowedException(startup, user);
@@ -194,11 +187,12 @@ public class StartupService {
 
         startupRepository.saveAndFlush(startup);
 
-        return possibleStartup.get();
+        return startup;
     }
 
     /**
      * Обработка транзакции сохранения стартапа и прикрепленных к нему файлов.
+     *
      * @param request StartupRequest
      * @param startup Startup
      */
@@ -230,6 +224,7 @@ public class StartupService {
 
     /**
      * Преобразование в список DTO
+     *
      * @param startup Startup стартап
      * @return StartupListDTO
      */
