@@ -8,6 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface TrackingRepository extends JpaRepository<Tracking, Long> {
+public interface TrackingRepository extends JpaRepository<Tracking, Long>, TrackingRepositoryWithJOOQ {
     List<Tracking> findByActiveTrueAndStartedAtAfter(Date startedAt);
 }

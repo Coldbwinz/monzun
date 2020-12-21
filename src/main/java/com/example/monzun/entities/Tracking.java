@@ -62,4 +62,11 @@ public class Tracking {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Tracking{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
