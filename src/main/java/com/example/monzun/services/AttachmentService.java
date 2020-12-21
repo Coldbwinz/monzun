@@ -5,6 +5,7 @@ import com.example.monzun.dto.AttachmentShortDTO;
 import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.Startup;
 import com.example.monzun.entities.User;
+import com.example.monzun.entities.WeekReport;
 import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import com.example.monzun.exception.FileIsEmptyException;
 import com.example.monzun.exception.UserByEmailNotFoundException;
@@ -30,7 +31,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -155,6 +155,21 @@ public class AttachmentService {
     }
 
     /**
+     * Обновление polytable type + polytable id для прикрепленных файлов еженедельного отчета
+     *
+     * @param weekReport     стартап
+     * @param attachments прикрепленные файлы
+     */
+    public void saveWeekReportFiles(WeekReport weekReport, List<Attachment> attachments) {
+        attachments.forEach(attachment -> {
+            attachment.setPolytableId(weekReport.getId());
+            attachment.setPolytableType(AttachmentPolytableTypeConstants.WEEK_REPORT.getType());
+            attachmentRepository.save(attachment);
+        });
+    }
+
+
+    /**
      * Преобразование модели в DTO
      *
      * @param attachment прикрепляемый файл
@@ -195,11 +210,8 @@ public class AttachmentService {
      */
     private Attachment saveAttachment(Path file, @Nullable String fileName) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> owner = userRepository.findByEmail(email);
-
-        if (!owner.isPresent()) {
-            throw new UserByEmailNotFoundException("User with email " + email + " not found");
-        }
+        User owner = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserByEmailNotFoundException("User with email " + email + " not found"));
 
         String baseURL = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         Attachment attachment = new Attachment();
@@ -208,7 +220,7 @@ public class AttachmentService {
         attachment.setOriginalFilename(fileName != null ? fileName : file.toFile().getName());
         attachment.setFilename(file.toFile().getName());
         attachment.setPath(file.toFile().getAbsolutePath());
-        attachment.setOwner(owner.get());
+        attachment.setOwner(owner);
         attachment.setCreatedAt(LocalDateTime.now());
         attachmentRepository.save(attachment);
 

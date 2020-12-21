@@ -1,12 +1,10 @@
 package com.example.monzun.services;
 
-import com.example.monzun.dto.UserListDTO;
 import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.User;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.MeRequest;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +17,14 @@ import java.util.Optional;
 public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final AttachmentRepository attachmentRepository;
 
     public UserService(
             UserRepository userRepository,
-            ModelMapper modelMapper,
             BCryptPasswordEncoder passwordEncoder,
             AttachmentRepository attachmentRepository
     ) {
-        this.modelMapper = modelMapper;
         this.attachmentRepository = attachmentRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -58,7 +53,7 @@ public class UserService {
         if (request.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        
+
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.saveAndFlush(user);
@@ -80,24 +75,11 @@ public class UserService {
 
     /**
      * Получение пользователя по ID
+     *
      * @param id User id
      * @return User
      */
     private User getUser(Long id) {
-        Optional<User> possibleUser = userRepository.findById(id);
-        if (!possibleUser.isPresent()) {
-            throw new EntityNotFoundException("User not found");
-        }
-
-        return possibleUser.get();
-    }
-
-    /**
-     * Преобразование в список DTOs
-     * @param user User пользователь
-     * @return UserListDTO
-     */
-    private UserListDTO convertToDto(User user) {
-        return modelMapper.map(user, UserListDTO.class);
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 }

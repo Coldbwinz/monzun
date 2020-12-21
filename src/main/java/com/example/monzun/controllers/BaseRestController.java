@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Базовый класс для REST контроллера.
@@ -20,22 +19,17 @@ public abstract class BaseRestController {
 
     /**
      * Получение текущего авторизованного пользователя
+     *
      * @return User авториванный пользователь
      * @throws NoAuthUserException NoAuthUserException
      */
     protected User getAuthUser() throws NoAuthUserException {
-        Optional<User> possibleUser = userRepository.findByEmail(
+        return userRepository.findByEmail(
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication()
                         .getName()
-        );
-
-        if (!possibleUser.isPresent()) {
-            throw new NoAuthUserException();
-        }
-
-        return possibleUser.get();
+        ).orElseThrow(NoAuthUserException::new);
     }
 
     /**

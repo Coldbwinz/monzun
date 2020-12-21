@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -23,15 +22,12 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UserByEmailNotFoundException {
-        Optional<com.example.monzun.entities.User> possibleUser = userRepository.findByEmail(email);
-
-        if (!possibleUser.isPresent()) {
-            throw new UserByEmailNotFoundException("User with email " + email + " not found");
-        }
+        com.example.monzun.entities.User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserByEmailNotFoundException("User with email " + email + " not found"));
 
         return new User(
-                possibleUser.get().getEmail(),
-                possibleUser.get().getPassword(),
+                user.getEmail(),
+                user.getPassword(),
                 new ArrayList<>()
         );
     }
