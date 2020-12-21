@@ -67,7 +67,7 @@ public class TrackingRequestService {
         List<Tracking> trackings = trackingRepository.findByActiveTrueAndStartedAtAfter(new Date());
         trackings.removeAll(trackingsFromRequests);
 
-        return trackings.stream().map(trackingService::convertToDto).collect(Collectors.toList());
+        return trackings.stream().map(trackingService::convertToListDto).collect(Collectors.toList());
     }
 
     /**

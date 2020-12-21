@@ -23,9 +23,10 @@ public class StartupRepositoryWithJOOQImpl implements StartupRepositoryWithJOOQ 
                 "FROM startups AS s " +
                 "JOIN trackings AS t " +
                 "ON t.is_active = TRUE " +
-                "JOIN startup_trackings AS st" +
+                "JOIN startup_trackings AS st " +
                 "ON st.startup_id = s.startup_id " +
-                "AND st.tracker_id =" + user.getId() + "AND st.tracking_id = t.tracking_id"
+                "AND st.tracker_id =" + user.getId() + " " +
+                "AND st.tracking_id = t.tracking_id"
         ).into(Startup.class);
     }
 
