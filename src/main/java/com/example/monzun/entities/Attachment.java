@@ -25,7 +25,7 @@ public class Attachment {
     private UUID uuid = UUID.randomUUID();
     @Column(name = "url")
     private String url;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     @Column(name = "filename", nullable = false)

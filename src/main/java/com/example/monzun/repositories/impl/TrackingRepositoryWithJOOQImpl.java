@@ -31,9 +31,9 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
                 "SELECT DISTINCT(t.*) " +
                 "FROM trackings AS t " +
                 "JOIN startups AS s " +
-                "JOIN startup_trackings AS st " +
                 "ON s.owner_id = "+ user.getId() + " " +
-                "AND st.startup_id = s.startup_id " +
+                "JOIN startup_trackings AS st " +
+                "ON st.startup_id = s.startup_id " +
                 "AND st.tracking_id = t.tracking_id " +
                 "ORDER BY t.is_active, t.started_at DESC"
         ).into(Tracking.class);

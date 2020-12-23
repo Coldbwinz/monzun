@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "startup_trackings", schema = "public")
-public class StartupTracking {
+public class StartupTracking implements Serializable {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
@@ -22,10 +23,10 @@ public class StartupTracking {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "startup_trackings_seq")
     Long id;
-    @ManyToOne(targetEntity = Tracking.class, optional = false)
+    @ManyToOne(targetEntity = Tracking.class, optional = false, fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
     @JoinColumn(name = "tracking_id", referencedColumnName = "tracking_id")
     private Tracking tracking;
-    @ManyToOne(targetEntity = Startup.class, optional = false)
+    @ManyToOne(targetEntity = Startup.class, optional = false, fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
     @JoinColumn(name = "startup_id", referencedColumnName = "startup_id")
     private Startup startup;
     @ManyToOne(targetEntity = User.class)

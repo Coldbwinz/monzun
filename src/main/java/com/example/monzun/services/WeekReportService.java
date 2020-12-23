@@ -113,7 +113,7 @@ public class WeekReportService {
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new EntityNotFoundException("Startup not found with id " + startupId));
 
-        if (!startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
+        if (startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
             throw new WeekReportNotAllowedException(tracking, startup, user);
         }
 
@@ -177,9 +177,13 @@ public class WeekReportService {
      *
      * @param reportId ID отчета
      */
-    public void delete(Long reportId) {
+    public void delete(Long reportId, User user) throws EntityNotFoundException, WeekReportNotAllowedException {
         WeekReport weekReport = weekReportRepository.findById(reportId)
                 .orElseThrow(() -> new EntityNotFoundException("Week report not found id" + reportId));
+
+        if (!weekReport.getOwner().equals(user)) {
+            throw new WeekReportNotAllowedException(weekReport.getTracking(), weekReport.getStartup(), user);
+        }
 
         weekReportRepository.delete(weekReport);
     }
