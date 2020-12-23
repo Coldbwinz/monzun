@@ -1,27 +1,20 @@
 package com.example.monzun.requests;
 
 import com.example.monzun.validation.rules.ExistsAttachmentFromList;
-import com.example.monzun.validation.rules.ExistsTaskStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskRequest {
+public class TaskCommentRequest {
     @ExistsAttachmentFromList
     private Long[] fileIds;
-    @NotNull(message = "status is required")
-    @ExistsTaskStatus
-    private Integer statusId;
-    @NotNull(message = "name is required")
-    private String name;
-    private String description;
-    private LocalDateTime deadlineAt;
+    @NotNull(message = "text is required")
+    private String text;
 }

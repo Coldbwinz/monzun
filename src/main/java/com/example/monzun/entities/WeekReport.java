@@ -1,7 +1,6 @@
 package com.example.monzun.entities;
 
 import com.example.monzun.dto.AttachmentShortDTO;
-import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,14 +66,5 @@ public class WeekReport {
     @Override
     public int hashCode() {
         return Objects.hash(id, tracking, startup, owner, week, estimate, comment, createdAt, updatedAt);
-    }
-
-    /**
-     * Polytable type еженедельного отчета
-     *
-     * @return String
-     */
-    public String getPolytableType() {
-        return AttachmentPolytableTypeConstants.WEEK_REPORT.getType();
     }
 }

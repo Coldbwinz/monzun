@@ -179,6 +179,20 @@ public class AttachmentService {
         });
     }
 
+    /**
+     * Обновление polytable type + polytable id для прикрепленных файлов комментария задачи
+     *
+     * @param taskComment комментарий задачи
+     * @param attachments прикрепленные файлы
+     */
+    public void saveTaskCommentFiles(TaskComment taskComment, List<Attachment> attachments) {
+        attachments.forEach(attachment -> {
+            attachment.setPolytableId(taskComment.getId());
+            attachment.setPolytableType(AttachmentPolytableTypeConstants.TASK_COMMENT.getType());
+            attachmentRepository.save(attachment);
+        });
+    }
+
 
     /**
      * Преобразование модели в DTO

@@ -78,9 +78,7 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("This tracking " + tracking.getName()
                         + " not contain startup name " + startup.getName()));
 
-        Role role= user.getRole();
-
-        if (role.equals(RoleEnum.STARTUP.getRole())) {
+        if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
             if (!startupTracking.getStartup().getOwner().equals(user)) {
                 throw new AccessDeniedException("Access denied for user id" + user.getId());
             }
@@ -171,7 +169,7 @@ public class TaskService {
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
 
-        transactionSaveWeekReport(taskRequest, task);
+        transactionSaveTask(taskRequest, task);
 
         return convertToDTO(task);
     }
@@ -199,7 +197,7 @@ public class TaskService {
         task.setDeadlineAt(taskRequest.getDeadlineAt());
         task.setUpdatedAt(LocalDateTime.now());
 
-        transactionSaveWeekReport(taskRequest, task);
+        transactionSaveTask(taskRequest, task);
 
         return convertToDTO(task);
     }
@@ -240,7 +238,7 @@ public class TaskService {
      * @param request TaskRequest
      * @param task    Задачи
      */
-    private void transactionSaveWeekReport(TaskRequest request, Task task) {
+    private void transactionSaveTask(TaskRequest request, Task task) {
         //если файлы не загружались, остается пустая коллекция
         List<Attachment> attachments = request.getFileIds() != null
                 ? attachmentRepository.findAllById(Arrays.asList(request.getFileIds()))
