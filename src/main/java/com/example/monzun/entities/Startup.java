@@ -1,7 +1,6 @@
 package com.example.monzun.entities;
 
 import com.example.monzun.dto.AttachmentShortDTO;
-import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -78,14 +77,5 @@ public class Startup {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    /**
-     * Polytable type стартапа
-     *
-     * @return String
-     */
-    public String getPolytableType() {
-        return AttachmentPolytableTypeConstants.STARTUP.getType();
     }
 }

@@ -5,7 +5,7 @@ package com.example.monzun.enums;
  */
 public enum AttachmentPolytableTypeConstants {
     STARTUP("startup"),
-    TRACKING("tracking"),
+    TASK_COMMENT("tracking"),
     WEEK_REPORT("week_report"),
     TASK("task");
 
