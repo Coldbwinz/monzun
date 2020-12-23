@@ -31,7 +31,7 @@ public class User {
     private String email;
     @Column(name = "phone")
     private String phone;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_id")
     private Attachment logo;
     @Column(name = "password", nullable = false)

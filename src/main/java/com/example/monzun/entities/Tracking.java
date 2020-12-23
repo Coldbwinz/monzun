@@ -43,7 +43,7 @@ public class Tracking {
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "startup_trackings",
             joinColumns = @JoinColumn(name = "tracking_id"),

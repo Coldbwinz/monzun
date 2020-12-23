@@ -2,10 +2,7 @@ package com.example.monzun.services;
 
 import com.example.monzun.dto.AttachmentDTO;
 import com.example.monzun.dto.AttachmentShortDTO;
-import com.example.monzun.entities.Attachment;
-import com.example.monzun.entities.Startup;
-import com.example.monzun.entities.User;
-import com.example.monzun.entities.WeekReport;
+import com.example.monzun.entities.*;
 import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import com.example.monzun.exception.FileIsEmptyException;
 import com.example.monzun.exception.UserByEmailNotFoundException;
@@ -157,13 +154,27 @@ public class AttachmentService {
     /**
      * Обновление polytable type + polytable id для прикрепленных файлов еженедельного отчета
      *
-     * @param weekReport     стартап
+     * @param weekReport  стартап
      * @param attachments прикрепленные файлы
      */
     public void saveWeekReportFiles(WeekReport weekReport, List<Attachment> attachments) {
         attachments.forEach(attachment -> {
             attachment.setPolytableId(weekReport.getId());
             attachment.setPolytableType(AttachmentPolytableTypeConstants.WEEK_REPORT.getType());
+            attachmentRepository.save(attachment);
+        });
+    }
+
+    /**
+     * Обновление polytable type + polytable id для прикрепленных файлов задачи
+     *
+     * @param task        задача
+     * @param attachments прикрепленные файлы
+     */
+    public void saveTaskFiles(Task task, List<Attachment> attachments) {
+        attachments.forEach(attachment -> {
+            attachment.setPolytableId(task.getId());
+            attachment.setPolytableType(AttachmentPolytableTypeConstants.TASK.getType());
             attachmentRepository.save(attachment);
         });
     }

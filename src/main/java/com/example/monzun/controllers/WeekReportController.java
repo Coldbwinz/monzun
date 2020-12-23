@@ -78,11 +78,15 @@ public class WeekReportController extends BaseRestController {
     @DeleteMapping("/{reportId}")
     public ResponseEntity<?> delete(@PathVariable Long reportId) {
         try {
-            weekReportService.delete(reportId);
+            weekReportService.delete(reportId, getAuthUser());
 
             return ResponseEntity.ok().body(getTrueResponse());
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(getErrorMessage("not_found", e.getMessage()));
+        } catch (NoAuthUserException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (WeekReportNotAllowedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(getErrorMessage("forbidden", e.getMessage()));
         }
     }
 }

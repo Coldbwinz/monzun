@@ -26,10 +26,10 @@ public class Startup {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "startups_seq")
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_id")
     private Attachment logo;
-    @ManyToOne()
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id")
     private User owner;
     @Column(name = "name", nullable = false)
@@ -50,7 +50,7 @@ public class Startup {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "startup_trackings",
             joinColumns = @JoinColumn(name = "startup_id"),
