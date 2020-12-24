@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +62,7 @@ public class TrackingRequestService {
                 .map(TrackingRequest::getTracking)
                 .collect(Collectors.toList());
 
-        List<Tracking> trackings = trackingRepository.findByActiveTrueAndStartedAtAfter(new Date());
+        List<Tracking> trackings = trackingRepository.findByActiveTrueAndStartedAtAfter(LocalDateTime.now());
         trackings.removeAll(trackingsFromRequests);
 
         return trackings.stream().map(trackingService::convertToListDto).collect(Collectors.toList());
@@ -88,7 +87,7 @@ public class TrackingRequestService {
         }
 
         Tracking tracking = checkPresenceAndGetTracking(trackingId);
-        if (new Date().after(tracking.getStartedAt())) {
+        if (LocalDateTime.now().isAfter(tracking.getStartedAt())) {
             throw new TrackingAlreadyStartedException();
         }
 

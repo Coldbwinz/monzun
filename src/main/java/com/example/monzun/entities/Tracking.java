@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,9 +35,9 @@ public class Tracking {
     @Column(name = "is_active")
     private boolean active;
     @Column(name = "started_at")
-    private Date startedAt;
+    private LocalDateTime startedAt;
     @Column(name = "ended_at", nullable = false)
-    private Date endedAt;
+    private LocalDateTime endedAt;
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at", insertable = false)
@@ -56,9 +55,22 @@ public class Tracking {
      * @return int
      */
     public int getCurrentWeek() {
-        return (int) (ChronoUnit.DAYS.between(startedAt.toInstant(), LocalDateTime.now()) / 7.0);
+        if (LocalDateTime.now().isAfter(endedAt)) {
+            return getWeeksCount();
+        }
+
+        long diffInDays = ChronoUnit.DAYS.between(startedAt, LocalDateTime.now());
+        System.out.println();
+        return diffInDays < 0 ? 0 : diffInDays <= 7 ? 1 : (int) Math.ceil((diffInDays / 7.0));
     }
 
+    /**
+     * Количество недель в наборе
+     * @return int
+     */
+    public int getWeeksCount() {
+        return (int) ChronoUnit.WEEKS.between(startedAt, endedAt);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
