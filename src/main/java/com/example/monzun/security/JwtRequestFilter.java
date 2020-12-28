@@ -2,6 +2,7 @@ package com.example.monzun.security;
 
 
 import com.example.monzun.services.MyUserDetailsService;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final MyUserDetailsService userDetailsService;
     private final com.example.monzun.security.JwtUtil jwtUtil;
+    public final static String JWT_HEADER = "Authorization";
+    public final static String JWT_HEADER_PREFIX = "Bearer ";
+
 
     public JwtRequestFilter(MyUserDetailsService userDetailsService, JwtUtil jwtUtil) {
         this.userDetailsService = userDetailsService;
@@ -27,11 +31,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain chain
+    )
             throws ServletException, IOException {
 
-        String JWT_HEADER = "Authorization";
-        String JWT_HEADER_PREFIX = "Bearer ";
         final String authorizationHeader = request.getHeader(JWT_HEADER);
         String username = null;
         String jwt = null;

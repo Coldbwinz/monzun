@@ -23,7 +23,7 @@ public class PasswordResetToken {
     @Column(name = "token")
     private String token;
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private User user;
     @Column(name = "expired_at")
     private LocalDateTime expiredAt = LocalDateTime.now().plusMinutes(2880); //2 days

@@ -133,20 +133,9 @@ public class StartupService {
 
         Startup startup = new Startup();
 
-        if (request.getLogoId() != null && attachmentRepository.findById(request.getLogoId()).isPresent()) {
-            startup.setLogo(attachmentRepository.findById(request.getLogoId()).get());
-        }
-
-        startup.setName(request.getName());
-        startup.setDescription(request.getDescription());
-        startup.setGrowthPlan(request.getGrowthPlan());
-        startup.setOwner(owner);
-        startup.setPoints(request.getPoints());
-        startup.setTasks(request.getTasks());
-        startup.setBusinessPlan(request.getBusinessPlan());
-        startup.setUseArea(request.getUseArea());
+        setStartupFields(request, startup);
         startup.setCreatedAt(LocalDateTime.now());
-        startup.setUpdatedAt(LocalDateTime.now());
+        startup.setOwner(owner);
 
         transactionSaveStartup(request, startup);
         startup.setAttachmentsDTO(getStartupAttachmentDTOs(startup));
@@ -169,18 +158,7 @@ public class StartupService {
             throw new StartupAccessNotAllowedException(startup, user);
         }
 
-        if (request.getLogoId() != null && attachmentRepository.findById(request.getLogoId()).isPresent()) {
-            startup.setLogo(attachmentRepository.findById(request.getLogoId()).get());
-        }
-
-        startup.setName(request.getDescription());
-        startup.setDescription(request.getDescription());
-        startup.setGrowthPlan(request.getGrowthPlan());
-        startup.setPoints(request.getPoints());
-        startup.setTasks(request.getTasks());
-        startup.setBusinessPlan(request.getBusinessPlan());
-        startup.setUseArea(request.getUseArea());
-        startup.setUpdatedAt(LocalDateTime.now());
+        setStartupFields(request, startup);
 
         transactionSaveStartup(request, startup);
         startup.setAttachmentsDTO(getStartupAttachmentDTOs(startup));
@@ -189,6 +167,7 @@ public class StartupService {
 
         return startup;
     }
+
 
     /**
      * Обработка транзакции сохранения стартапа и прикрепленных к нему файлов.
@@ -230,5 +209,20 @@ public class StartupService {
      */
     private StartupListDTO convertToDto(Startup startup) {
         return modelMapper.map(startup, StartupListDTO.class);
+    }
+
+    private void setStartupFields(StartupRequest request, Startup startup) {
+        if (request.getLogoId() != null && attachmentRepository.findById(request.getLogoId()).isPresent()) {
+            startup.setLogo(attachmentRepository.findById(request.getLogoId()).get());
+        }
+
+        startup.setName(request.getName());
+        startup.setDescription(request.getDescription());
+        startup.setGrowthPlan(request.getGrowthPlan());
+        startup.setPoints(request.getPoints());
+        startup.setTasks(request.getTasks());
+        startup.setBusinessPlan(request.getBusinessPlan());
+        startup.setUseArea(request.getUseArea());
+        startup.setUpdatedAt(LocalDateTime.now());
     }
 }
