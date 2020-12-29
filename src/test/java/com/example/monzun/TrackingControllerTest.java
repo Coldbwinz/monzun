@@ -1,6 +1,9 @@
 package com.example.monzun;
 
-import com.example.monzun.entities.*;
+import com.example.monzun.entities.Startup;
+import com.example.monzun.entities.StartupTracking;
+import com.example.monzun.entities.Tracking;
+import com.example.monzun.entities.User;
 import com.example.monzun.enums.RoleEnum;
 import com.example.monzun.repositories.StartupRepository;
 import com.example.monzun.repositories.StartupTrackingRepository;
@@ -9,16 +12,12 @@ import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.security.JwtRequestFilter;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
-import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,14 +25,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Configurable
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TrackingControllerTest extends BaseTest {
     private final String TEST_STARTUP_EMAIL = "TESTSTARTUP@ya.ru";
     private final String TEST_TRACKER_EMAIL = "TESTTRACKER@mail.ru";
@@ -62,16 +64,17 @@ public class TrackingControllerTest extends BaseTest {
     @Autowired
     private MockMvc mockMvc;
 
-
-    @Before
-    public void setup() {
+    @BeforeAll
+    public void setUp() {
         createStartupOwner();
         createTracker();
         Startup startup = createTestStartupObject();
         tracking = createTrackingWithStartup(startup);
     }
 
+
     @Test
+    @Order(1)
     public void getTrackingsByStartupTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
 
@@ -85,6 +88,7 @@ public class TrackingControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(2)
     public void getTrackingsByTrackerTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
 
@@ -98,6 +102,7 @@ public class TrackingControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(3)
     public void getTrackingByStartupTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
         mockMvc.perform(
@@ -110,6 +115,7 @@ public class TrackingControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(4)
     public void getTrackingByTrackerTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
         mockMvc.perform(
@@ -122,7 +128,7 @@ public class TrackingControllerTest extends BaseTest {
     }
 
 
-    @After
+    @AfterAll
     public void teardown() {
         startupRepository.deleteAll();
         startupTrackingRepository.deleteAll();

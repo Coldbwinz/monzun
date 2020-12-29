@@ -8,9 +8,7 @@ import com.example.monzun.security.JwtRequestFilter;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -25,7 +23,6 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Configurable
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TaskControllerTest extends BaseTest {
     private final String TEST_STARTUP_EMAIL = "TESTSTARTUP@ya.ru";
     private final String TEST_TRACKER_EMAIL = "TESTTRACKER@mail.ru";
@@ -68,7 +67,7 @@ public class TaskControllerTest extends BaseTest {
     private MockMvc mockMvc;
 
 
-    @Before
+    @BeforeAll
     public void setup() {
         createStartupOwner();
         tracker = createTracker();
@@ -77,6 +76,7 @@ public class TaskControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(1)
     public void getTasksByStartupTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -91,6 +91,7 @@ public class TaskControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(2)
     public void getTasksByTrackerTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -100,11 +101,12 @@ public class TaskControllerTest extends BaseTest {
                         .header(JwtRequestFilter.JWT_HEADER, JwtRequestFilter.JWT_HEADER_PREFIX + jwt)
         )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(task.getId().intValue())))
-                .andExpect(jsonPath("$[0].name", is(task.getName())));
+                .andExpect(jsonPath("$[1].id", is(task.getId().intValue())))
+                .andExpect(jsonPath("$[1].name", is(task.getName())));
     }
 
     @Test
+    @Order(3)
     public void getTaskByStartupTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -119,6 +121,7 @@ public class TaskControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(4)
     public void getTaskByTrackerTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -133,6 +136,7 @@ public class TaskControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(5)
     public void createTaskTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
         String name = faker.name().name();
@@ -162,6 +166,7 @@ public class TaskControllerTest extends BaseTest {
 
 
     @Test
+    @Order(6)
     public void updateTaskTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -184,6 +189,7 @@ public class TaskControllerTest extends BaseTest {
 
 
     @Test
+    @Order(7)
     public void deleteWeekReport() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
         Task task = createTask(tracking, startup, tracker);
@@ -196,7 +202,7 @@ public class TaskControllerTest extends BaseTest {
     }
 
 
-    @After
+    @AfterAll
     public void teardown() {
         startupRepository.deleteAll();
         startupTrackingRepository.deleteAll();

@@ -8,9 +8,8 @@ import com.example.monzun.security.JwtRequestFilter;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -33,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Configurable
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TaskCommentControllerTest extends BaseTest {
     private final String TEST_STARTUP_EMAIL = "TESTSTARTUP@ya.ru";
     private final String TEST_TRACKER_EMAIL = "TESTTRACKER@mail.ru";
@@ -70,7 +71,7 @@ public class TaskCommentControllerTest extends BaseTest {
     private MockMvc mockMvc;
 
 
-    @Before
+    @BeforeAll
     public void setup() {
         createStartupOwner();
         tracker = createTracker();
@@ -79,12 +80,12 @@ public class TaskCommentControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(1)
     public void getTaskCommentsByStartupTest() throws Exception {
         authUser(TEST_STARTUP_EMAIL);
 
         Task task = createTask(tracking, startup, tracker);
         TaskComment taskComment = createTaskComment(task, tracker);
-
 
         mockMvc.perform(
                 get(API_PREFIX + task.getId())
@@ -96,6 +97,7 @@ public class TaskCommentControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(2)
     public void getTaskCommentsByTrackerTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
 
@@ -113,6 +115,7 @@ public class TaskCommentControllerTest extends BaseTest {
 
 
     @Test
+    @Order(3)
     public void createTaskCommentTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
 
@@ -134,6 +137,7 @@ public class TaskCommentControllerTest extends BaseTest {
 
 
     @Test
+    @Order(4)
     public void updateTaskTest() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
 
@@ -157,6 +161,7 @@ public class TaskCommentControllerTest extends BaseTest {
 
 
     @Test
+    @Order(5)
     public void deleteWeekReport() throws Exception {
         authUser(TEST_TRACKER_EMAIL);
 
@@ -171,7 +176,7 @@ public class TaskCommentControllerTest extends BaseTest {
     }
 
 
-    @After
+    @AfterAll
     public void teardown() {
         startupRepository.deleteAll();
         startupTrackingRepository.deleteAll();

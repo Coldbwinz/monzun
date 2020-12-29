@@ -9,9 +9,7 @@ import com.example.monzun.security.JwtRequestFilter;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -32,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Configurable
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StartupControllerTest extends BaseTest {
     private final String TEST_USER_EMAIL = "TESTOWNERSTARTUPS@MAIL.RU";
     private String jwt;
@@ -52,7 +52,7 @@ public class StartupControllerTest extends BaseTest {
     private MockMvc mockMvc;
 
 
-    @Before
+    @BeforeAll
     public void setup() {
         User owner = new User();
         owner.setName(faker.name().name());
@@ -65,6 +65,7 @@ public class StartupControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(1)
     public void getUserStartupsTest() throws Exception {
         Startup startup = createTestStartupObject();
 
@@ -78,6 +79,7 @@ public class StartupControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(2)
     public void getUserStartupTest() throws Exception {
         Startup startup = createTestStartupObject();
 
@@ -92,6 +94,7 @@ public class StartupControllerTest extends BaseTest {
 
 
     @Test
+    @Order(3)
     public void createStartupTest() throws Exception {
         JSONObject params = new JSONObject();
         params.put("name", faker.name().name());
@@ -105,10 +108,11 @@ public class StartupControllerTest extends BaseTest {
     }
 
     @Test
+    @Order(4)
     public void updateStartupTest() throws Exception {
-        String updatedName = faker.name().name();
         Startup startup = createTestStartupObject();
 
+        String updatedName = faker.name().name();
         JSONObject params = new JSONObject();
         params.put("name", updatedName);
 
@@ -123,22 +127,19 @@ public class StartupControllerTest extends BaseTest {
     }
 
 
-    @After
+    @AfterAll
     public void teardown() {
         startupRepository.deleteAll();
         userRepository.findByEmail(TEST_USER_EMAIL).ifPresent(userRepository::delete);
     }
 
-    private void setStartupOwner(Startup startup) {
-        if (userRepository.findByEmail(TEST_USER_EMAIL).isPresent()) {
-            startup.setOwner(userRepository.findByEmail(TEST_USER_EMAIL).get());
-        }
-    }
 
     private Startup createTestStartupObject() {
         Startup startup = new Startup();
         startup.setName(faker.name().name());
-        setStartupOwner(startup);
+        if (userRepository.findByEmail(TEST_USER_EMAIL).isPresent()) {
+            startup.setOwner(userRepository.findByEmail(TEST_USER_EMAIL).get());
+        }
         startupRepository.save(startup);
 
         return startup;
