@@ -2,6 +2,7 @@ package com.example.monzun.requests;
 
 import com.example.monzun.validation.rules.ExistsAttachment;
 import com.example.monzun.validation.rules.UniqueUserEmail;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,9 +18,11 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 public class MeRequest {
     @NotNull
+    @ApiModelProperty(required = true)
     private String name;
     @UniqueUserEmail
     @NotNull
+    @ApiModelProperty(required = true)
     private String email;
     @Pattern(
             regexp = "^(\\+7|7|8)?[\\s\\-]?\\(?[0-9]{3}\\)?[\\s\\-]?[0-9]{3}[\\s\\-]?[0-9]{2}[\\s\\-]?[0-9]{2}$",
@@ -28,7 +31,6 @@ public class MeRequest {
     private String phone;
     @ExistsAttachment
     private Long avatarId;
-    @NotNull
     @Min(6)
     private String password;
 }

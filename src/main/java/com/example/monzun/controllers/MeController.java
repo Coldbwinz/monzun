@@ -4,7 +4,6 @@ import com.example.monzun.dto.UserDTO;
 import com.example.monzun.entities.Mail;
 import com.example.monzun.entities.User;
 import com.example.monzun.exception.NoAuthUserException;
-import com.example.monzun.exception.UserByEmailNotFoundException;
 import com.example.monzun.repositories.PasswordResetTokenRepository;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.MeRequest;
@@ -12,8 +11,13 @@ import com.example.monzun.requests.PasswordChangeRequest;
 import com.example.monzun.services.EmailService;
 import com.example.monzun.services.PasswordResetTokenService;
 import com.example.monzun.services.UserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -58,9 +62,18 @@ public class MeController extends BaseRestController {
 
     /**
      * Просмотр авторизованного пользователя
+     *
      * @return JSON
      */
-    @GetMapping()
+    @ApiOperation(
+            value = "Получение собственного профиля",
+            notes = "Запрос информации об авторизованном пользователе. Используется для просмотра собственного профиля"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = UserDTO.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован")
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> me() {
         try {
             return ResponseEntity.ok(new UserDTO(this.getAuthUser()));
@@ -71,11 +84,20 @@ public class MeController extends BaseRestController {
 
     /**
      * Редактирование авторизованного пользователя
+     *
      * @param request MeRequest
      * @return JSON
      */
-    @PutMapping()
-    public ResponseEntity<?> editMe(@Valid MeRequest request) {
+    @ApiOperation(value = "Редактирование собственного профиля")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = UserDTO.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Пользователь не найден")
+    })
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> editMe(
+            @ApiParam
+            @Valid MeRequest request) {
         try {
             User updatedUser = userService.update(getAuthUser().getId(), request);
 
@@ -92,8 +114,14 @@ public class MeController extends BaseRestController {
      * @param response Response
      * @throws IOException IOException
      */
+    @ApiOperation(value = "Редирект на страницу изменения профиля. " +
+            "Если токен совпадает - редирект на страницу смены пароля.")
     @GetMapping("/changePassword")
-    public void showChangePasswordPage(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+    public void showChangePasswordPage(
+            @ApiParam(required = true)
+            @RequestParam("token") String token,
+            HttpServletResponse response
+    ) throws IOException {
         boolean isValid = passwordResetTokenService.isValidPasswordResetToken(token);
         String redirectUrl = isValid ? "1" : "2"; //TODO: need links
 
@@ -106,11 +134,21 @@ public class MeController extends BaseRestController {
      * @param email Почта пользователя
      * @return JSON
      */
-    @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestParam String email) {
+    @ApiOperation(value = "Сброс пароля", notes = "Отправка почты для сбора пароля с подтверждением в виде токена")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = UserDTO.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Пользователь не найден")
+    })
+    @PostMapping(value = "/resetPassword", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> resetPassword(
+            @ApiParam(required = true)
+            @RequestParam String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if (!possibleUser.isPresent()) {
-            throw new UserByEmailNotFoundException("User with email " + email + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(this.getErrorMessage("not_found", "User with email " + email + " not found"));
+
         }
         String token = UUID.randomUUID().toString();
         passwordResetTokenService.createPasswordResetTokenForUser(possibleUser.get(), token);
@@ -141,8 +179,17 @@ public class MeController extends BaseRestController {
      * @param passwordChangeRequest структура параметров при запросе
      * @return JSON
      */
-    @PostMapping("/savePassword")
-    public ResponseEntity<?> savePassword(@Valid PasswordChangeRequest passwordChangeRequest) {
+    @ApiOperation(value = "Редактирование пароля",
+            notes = "Изменение пароля с учетом проверки токена")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Пользователь не найден"),
+            @ApiResponse(code = 422, message = "Токен для сброса пароля не валидный")
+    })
+    @PostMapping(value = "/savePassword", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> savePassword(
+            @ApiParam @Valid PasswordChangeRequest passwordChangeRequest) {
         boolean result = passwordResetTokenService.isValidPasswordResetToken(passwordChangeRequest.getToken());
 
         if (!result) {

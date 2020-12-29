@@ -9,7 +9,12 @@ import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.AuthRequest;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,8 +58,19 @@ public class LoginController extends BaseRestController {
      * @param request credentials пользователя
      * @return JSON
      */
-    @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody AuthRequest request) {
+    @ApiOperation(
+            value = "Авторизация",
+            notes = "Пользователь авторизуется по почте и паролю",
+            response = AuthUserDTO.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = AuthUserDTO.class),
+            @ApiResponse(code = 422, message = "Неверные данные для входа")
+    })
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createAuthenticationToken(
+            @ApiParam(value = "Данные для входа", required = true)
+            @Valid @RequestBody AuthRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())

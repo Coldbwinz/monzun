@@ -3,6 +3,10 @@ package com.example.monzun.controllers;
 
 import com.example.monzun.exception.NoAuthUserException;
 import com.example.monzun.services.StatisticService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,8 +29,22 @@ public class StatisticController extends BaseRestController {
         this.statisticService = statisticService;
     }
 
+    @ApiOperation(
+            value = "Просмотр статистики стартапа",
+            notes = "Статистика стартапа в наборе это сборник отчетов трекера по неделям с его оценками" +
+                    " и средняя оценка по текущим неделям"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Набор или стартап не найден"),
+    })
     @GetMapping("/{trackingId}/{startupId}")
-    public ResponseEntity<?> getStats(@PathVariable Long trackingId, @PathVariable Long startupId) {
+    public ResponseEntity<?> getStats(
+            @ApiParam(required = true, value = "ID набора") @PathVariable Long trackingId,
+            @ApiParam(required = true, value = "ID стартапа") @PathVariable Long startupId
+    ) {
         try {
             return ResponseEntity.ok(statisticService.get(trackingId, startupId, getAuthUser()));
         } catch (NoAuthUserException e) {

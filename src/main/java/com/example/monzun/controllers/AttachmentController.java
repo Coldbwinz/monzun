@@ -3,6 +3,10 @@ package com.example.monzun.controllers;
 import com.example.monzun.dto.AttachmentDTO;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.services.AttachmentService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,8 +39,21 @@ public class AttachmentController extends BaseRestController {
      * @return JSON-структура загруженного файла
      * @throws IOException IOException
      */
+    @ApiOperation(
+            value = "Загрузить файлы",
+            notes = "Мультизагрузка файлов на сервер и возрат соответствующих сущностей",
+            response = AttachmentDTO.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 403, message = "Доступ запрещен")
+    })
     @PostMapping("/upload")
-    public List<AttachmentDTO> upload(@RequestParam("files") MultipartFile[] files) throws IOException {
+    public List<AttachmentDTO> upload(
+            @ApiParam(required = true, name = "files", value = "Файлы для загруки")
+            @RequestParam("files") MultipartFile[] files
+    ) throws IOException {
         return attachmentService.getAttachmentsDTO(attachmentService.storeFiles(files));
     }
 
@@ -50,9 +67,28 @@ public class AttachmentController extends BaseRestController {
      * @return ResponseEntity - JSON ответ
      * @throws IOException IOException
      */
+    @ApiOperation(
+            value = "Скачивание файла",
+            notes = "Скачивание файла с сервера по UUID",
+            response = AttachmentDTO.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 404, message = "Файл не найден"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 403, message = "Доступ запрещен")
+    })
     @GetMapping("/download/{uuid:.+}")
     public ResponseEntity<?> download(
-            @RequestParam Optional<Boolean> forceDownload,
+            @ApiParam(
+                    allowableValues = "true, false",
+                    value = "Флаг принудительной загрузки.Если параметр передан true - загрузка происходит сразу"
+            )
+            @RequestParam boolean forceDownload,
+            @ApiParam(
+                    required = true,
+                    value = "UUID файла для загрузки"
+            )
             @PathVariable String uuid,
             HttpServletRequest request
     ) throws IOException {
@@ -63,7 +99,7 @@ public class AttachmentController extends BaseRestController {
 
         Resource resource = attachmentService.download(uuidFromString);
         String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        String contentDisposition = forceDownload.isPresent() ? "attachment" : "inline";
+        String contentDisposition = forceDownload ? "attachment" : "inline";
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -79,8 +115,21 @@ public class AttachmentController extends BaseRestController {
      * @return ResponseEntity - JSON ответ
      * @throws IOException IOException
      */
+    @ApiOperation(
+            value = "Удалить файл",
+            notes = "Удаление файла по UUID"
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 404, message = "Файл не найден"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 403, message = "Доступ запрещен")
+    })
     @DeleteMapping("/delete/{uuid:.+}")
-    public ResponseEntity<?> delete(@PathVariable String uuid) throws IOException {
+    public ResponseEntity<?> delete(
+            @ApiParam(required = true, value = "UUID файла для удаления")
+            @PathVariable String uuid
+    ) throws IOException {
         return attachmentService.delete(UUID.fromString(uuid))
                 ? ResponseEntity.status(HttpStatus.OK).body(this.getTrueResponse())
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).build();

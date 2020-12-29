@@ -2,12 +2,18 @@ package com.example.monzun.controllers;
 
 
 import com.example.monzun.dto.StartupDTO;
+import com.example.monzun.dto.StartupListDTO;
 import com.example.monzun.exception.NoAuthUserException;
 import com.example.monzun.exception.StartupAccessNotAllowedException;
 import com.example.monzun.exception.StartupCreateNotAllowedException;
 import com.example.monzun.requests.StartupRequest;
 import com.example.monzun.services.StartupService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +37,12 @@ public class StartupController extends BaseRestController {
      *
      * @return JSON
      */
-    @GetMapping()
+    @ApiOperation(value = "Список стартапов")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = StartupListDTO.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован")
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> list() {
         try {
             return ResponseEntity.ok(startupService.getStartups(getAuthUser()));
@@ -46,8 +57,16 @@ public class StartupController extends BaseRestController {
      * @param id Startup id
      * @return JSON
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> show(@PathVariable Long id) {
+    @ApiOperation(value = "Просмотр конкретного стартапа")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = StartupDTO.class),
+            @ApiResponse(code = 404, message = "Стартап не найден"),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован")
+    })
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> show(
+            @ApiParam(required = true, value = "ID стартапа") @PathVariable Long id) {
         try {
             return ResponseEntity.ok(startupService.getStartup(id, getAuthUser()));
         } catch (NoAuthUserException e) {
@@ -67,8 +86,14 @@ public class StartupController extends BaseRestController {
      * @param request StartupRequest
      * @return JSON
      */
-    @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody StartupRequest request) {
+    @ApiOperation(value = "Создание стартапа")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = StartupDTO.class),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован")
+    })
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> create(@ApiParam @Valid @RequestBody StartupRequest request) {
         try {
             return ResponseEntity.ok(new StartupDTO(startupService.create(request, getAuthUser())));
         } catch (NoAuthUserException e) {
@@ -85,10 +110,17 @@ public class StartupController extends BaseRestController {
      * @param request StartupRequest
      * @return JSON
      */
-    @PutMapping("/{id}")
+    @ApiOperation(value = "Редактирование стартапа")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = StartupDTO.class),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Стартап не найден"),
+    })
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(
-            @PathVariable Long id,
-            @Valid @RequestBody StartupRequest request
+            @ApiParam(required = true, value = "ID стартапа") @PathVariable Long id,
+            @ApiParam @Valid @RequestBody StartupRequest request
     ) {
         try {
             return ResponseEntity.ok().body(new StartupDTO(startupService.update(id, request, getAuthUser())));

@@ -1,11 +1,18 @@
 package com.example.monzun.controllers;
 
 
+import com.example.monzun.dto.TrackingListDTO;
+import com.example.monzun.entities.TrackingRequest;
 import com.example.monzun.exception.NoAuthUserException;
 import com.example.monzun.exception.TrackingAlreadyStartedException;
 import com.example.monzun.exception.TrackingForRequestListAccessException;
 import com.example.monzun.services.TrackingRequestService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +32,16 @@ public class TrackingRequestController extends BaseRestController {
 
     /**
      * Просмотр списка наборов для записи. Доступен только участнику
+     *
      * @return JSON
      */
-    @GetMapping("/trackings")
+    @ApiOperation(value = "Список наборов для участника")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = TrackingListDTO.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+    })
+    @GetMapping(value = "/trackings", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> trackingList() {
         try {
             return ResponseEntity.ok().body(trackingRequestService.getTrackingList(getAuthUser()));
@@ -46,8 +60,18 @@ public class TrackingRequestController extends BaseRestController {
      * @param startupId  ID стартапа
      * @return JSON
      */
-    @PostMapping("/{trackingId}/{startupId}")
-    public ResponseEntity<?> create(@PathVariable Long trackingId, @PathVariable Long startupId) {
+    @ApiOperation(value = "Подача заявка на вступление в набор для участника")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = TrackingRequest.class),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 403, message = "Доступ запрещен"),
+            @ApiResponse(code = 404, message = "Набор или стартап не найден"),
+    })
+    @PostMapping(value = "/{trackingId}/{startupId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> create(
+            @ApiParam(required = true, value = "ID набора") @PathVariable Long trackingId,
+            @ApiParam(required = true, value = "ID стартапа") @PathVariable Long startupId
+    ) {
         try {
             return ResponseEntity.ok(trackingRequestService.create(trackingId, startupId, getAuthUser()));
         } catch (NoAuthUserException e) {
@@ -66,8 +90,17 @@ public class TrackingRequestController extends BaseRestController {
      * @param startupId  ID стартапа
      * @return JSON
      */
-    @DeleteMapping("/{trackingId}/{startupId}")
-    public ResponseEntity<?> delete(@PathVariable Long trackingId, @PathVariable Long startupId) {
+    @ApiOperation(value = "Отмена заявки в набор для участника")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 401, message = "Пользователь не авторизован"),
+            @ApiResponse(code = 404, message = "Набор или стартап не найден"),
+    })
+    @DeleteMapping(value = "/{trackingId}/{startupId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> delete(
+            @ApiParam(required = true, value = "ID набора") @PathVariable Long trackingId,
+            @ApiParam(required = true, value = "ID стартапа") @PathVariable Long startupId
+    ) {
         try {
             trackingRequestService.delete(trackingId, startupId, getAuthUser());
             return ResponseEntity.ok(this.getTrueResponse());
