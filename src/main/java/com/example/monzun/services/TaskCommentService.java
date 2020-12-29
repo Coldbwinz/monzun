@@ -7,7 +7,9 @@ import com.example.monzun.entities.Task;
 import com.example.monzun.entities.TaskComment;
 import com.example.monzun.entities.User;
 import com.example.monzun.enums.RoleEnum;
-import com.example.monzun.repositories.*;
+import com.example.monzun.repositories.AttachmentRepository;
+import com.example.monzun.repositories.TaskCommentRepository;
+import com.example.monzun.repositories.TaskRepository;
 import com.example.monzun.requests.TaskCommentRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,26 +29,25 @@ import java.util.stream.Collectors;
 public class TaskCommentService {
 
     private final ModelMapper modelMapper;
-    private final TrackingRepository trackingRepository;
-    private final StartupRepository startupRepository;
-    private final StartupTrackingRepository startupTrackingRepository;
     private final TaskRepository taskRepository;
     private final AttachmentService attachmentService;
     private final AttachmentRepository attachmentRepository;
     private final TransactionTemplate transactionTemplate;
-    private final TaskStatusRepository taskStatusRepository;
     private final TaskCommentRepository taskCommentRepository;
 
-    public TaskCommentService(ModelMapper modelMapper, TrackingRepository trackingRepository, StartupRepository startupRepository, StartupTrackingRepository startupTrackingRepository, TaskRepository taskRepository, AttachmentService attachmentService, AttachmentRepository attachmentRepository, TransactionTemplate transactionTemplate, TaskStatusRepository taskStatusRepository, TaskCommentRepository taskCommentRepository) {
+    public TaskCommentService(
+            ModelMapper modelMapper,
+            TaskRepository taskRepository,
+            AttachmentService attachmentService,
+            AttachmentRepository attachmentRepository,
+            TransactionTemplate transactionTemplate,
+            TaskCommentRepository taskCommentRepository
+    ) {
         this.modelMapper = modelMapper;
-        this.trackingRepository = trackingRepository;
-        this.startupRepository = startupRepository;
-        this.startupTrackingRepository = startupTrackingRepository;
         this.taskRepository = taskRepository;
         this.attachmentService = attachmentService;
         this.attachmentRepository = attachmentRepository;
         this.transactionTemplate = transactionTemplate;
-        this.taskStatusRepository = taskStatusRepository;
         this.taskCommentRepository = taskCommentRepository;
     }
 

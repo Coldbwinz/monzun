@@ -34,7 +34,7 @@ public enum WeekReportEstimatesEnum {
         return null;
     }
 
-    public Integer getScore() {
+    public Integer  getScore() {
         return score;
     }
 

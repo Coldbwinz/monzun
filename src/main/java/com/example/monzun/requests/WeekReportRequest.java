@@ -20,7 +20,7 @@ public class WeekReportRequest {
     @NotNull(message = "Week is required")
     @Positive(message = "Week should be positive")
     private Integer week;
-    @NotNull
+    @NotNull(message = "Estimate is required")
     @Positive
     @ValidWeekReportEstimate
     private Integer estimate;

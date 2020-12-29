@@ -67,7 +67,17 @@ public class WeekReportService {
         WeekReport weekReport = weekReportRepository.findById(weekReportId)
                 .orElseThrow(() -> new EntityNotFoundException("Week report not found id " + weekReportId));
 
-        if (!weekReport.getOwner().equals(user)) {
+        if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
+            if (!weekReport.getStartup().getOwner().equals(user)) {
+                throw new AccessDeniedException("This week report id "
+                        + weekReportId + " allowed to for this user " + user.toString());
+            }
+        } else if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
+            if (!weekReport.getOwner().equals(user)) {
+                throw new AccessDeniedException("This week report id "
+                        + weekReportId + " allowed to for this user " + user.toString());
+            }
+        } else {
             throw new AccessDeniedException("This week report id "
                     + weekReportId + " allowed to for this user " + user.toString());
         }
@@ -113,7 +123,7 @@ public class WeekReportService {
         Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new EntityNotFoundException("Startup not found with id " + startupId));
 
-        if (startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
+        if (!startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
             throw new WeekReportNotAllowedException(tracking, startup, user);
         }
 

@@ -23,10 +23,10 @@ public class StartupTracking implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "startup_trackings_seq")
     Long id;
-    @ManyToOne(targetEntity = Tracking.class, optional = false, fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
+    @ManyToOne(targetEntity = Tracking.class, optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "tracking_id", referencedColumnName = "tracking_id")
     private Tracking tracking;
-    @ManyToOne(targetEntity = Startup.class, optional = false, fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
+    @ManyToOne(targetEntity = Startup.class, optional = false, fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "startup_id", referencedColumnName = "startup_id")
     private Startup startup;
     @ManyToOne(targetEntity = User.class)

@@ -71,7 +71,7 @@ public class TaskService {
         Tracking tracking = trackingRepository.findById(trackingId)
                 .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + trackingId));
 
-        Startup startup = startupRepository.findById(trackingId)
+        Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new EntityNotFoundException("Startup not found id " + startupId));
 
         StartupTracking startupTracking = startupTrackingRepository.findByTrackingAndStartup(tracking, startup)
@@ -146,10 +146,10 @@ public class TaskService {
         Tracking tracking = trackingRepository.findById(trackingId)
                 .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + trackingId));
 
-        Startup startup = startupRepository.findById(trackingId)
+        Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new EntityNotFoundException("Startup not found id " + startupId));
 
-        if (startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
+        if (!startupTrackingRepository.existsByStartupAndTrackingAndTracker(startup, tracking, user)) {
             throw new AccessDeniedException("User id " + user.getId() + " cant create tasks to startup id "
                     + startupId + " in tracking id " + trackingId);
         }

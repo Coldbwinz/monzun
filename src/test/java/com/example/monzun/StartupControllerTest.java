@@ -66,10 +66,7 @@ public class StartupControllerTest extends BaseTest {
 
     @Test
     public void getUserStartupsTest() throws Exception {
-        Startup startup = new Startup();
-        startup.setName(faker.name().name());
-        setStartupOwner(startup);
-        startupRepository.save(startup);
+        Startup startup = createTestStartupObject();
 
         mockMvc.perform(
                 get(API_PREFIX)
@@ -77,16 +74,12 @@ public class StartupControllerTest extends BaseTest {
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(startup.getId().intValue())))
-                .andExpect(jsonPath("$[0].name", is(startup.getName())))
-        ;
+                .andExpect(jsonPath("$[0].name", is(startup.getName())));
     }
 
     @Test
     public void getUserStartupTest() throws Exception {
-        Startup startup = new Startup();
-        startup.setName(faker.name().name());
-        setStartupOwner(startup);
-        startupRepository.save(startup);
+        Startup startup = createTestStartupObject();
 
         mockMvc.perform(
                 get(API_PREFIX + startup.getId())
@@ -94,8 +87,7 @@ public class StartupControllerTest extends BaseTest {
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(startup.getId().intValue())))
-                .andExpect(jsonPath("$.name", is(startup.getName())))
-        ;
+                .andExpect(jsonPath("$.name", is(startup.getName())));
     }
 
 
@@ -115,11 +107,7 @@ public class StartupControllerTest extends BaseTest {
     @Test
     public void updateStartupTest() throws Exception {
         String updatedName = faker.name().name();
-
-        Startup startup = new Startup();
-        startup.setName(faker.name().name());
-        setStartupOwner(startup);
-        startupRepository.save(startup);
+        Startup startup = createTestStartupObject();
 
         JSONObject params = new JSONObject();
         params.put("name", updatedName);
@@ -145,5 +133,14 @@ public class StartupControllerTest extends BaseTest {
         if (userRepository.findByEmail(TEST_USER_EMAIL).isPresent()) {
             startup.setOwner(userRepository.findByEmail(TEST_USER_EMAIL).get());
         }
+    }
+
+    private Startup createTestStartupObject() {
+        Startup startup = new Startup();
+        startup.setName(faker.name().name());
+        setStartupOwner(startup);
+        startupRepository.save(startup);
+
+        return startup;
     }
 }

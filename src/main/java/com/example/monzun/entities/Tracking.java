@@ -60,17 +60,21 @@ public class Tracking {
         }
 
         long diffInDays = ChronoUnit.DAYS.between(startedAt, LocalDateTime.now());
-        System.out.println();
-        return diffInDays < 0 ? 0 : diffInDays <= 7 ? 1 : (int) Math.ceil((diffInDays / 7.0));
+
+        return diffInDays < 0 ? 0 : diffInDays >= 7 ? (int) Math.ceil((diffInDays / 7.0)) : 1;
     }
 
     /**
      * Количество недель в наборе
+     *
      * @return int
      */
     public int getWeeksCount() {
-        return (int) ChronoUnit.WEEKS.between(startedAt, endedAt);
+        int diffInWeeks = (int) ChronoUnit.WEEKS.between(startedAt, endedAt);
+
+        return diffInWeeks == 0 ? 1 : diffInWeeks;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
