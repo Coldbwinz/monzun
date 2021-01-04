@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -83,7 +84,7 @@ public class AttachmentService {
      * @return Attachment файл
      * @throws IOException IOException
      */
-    private Attachment storeFile(MultipartFile file) throws IOException {
+    public Attachment storeFile(MultipartFile file) throws IOException {
         Attachment attachment;
         if (file.isEmpty()) {
             throw new FileIsEmptyException("File is empty " + file.getName());
@@ -222,6 +223,14 @@ public class AttachmentService {
      * @throws IOException IOException
      */
     private Path saveFile(MultipartFile file) throws IOException {
+        File dir = new File(UPLOAD_PATH);
+
+        if (!dir.exists()) {
+            if (!dir.mkdirs()){
+                throw new IOException("Directory cannot create");
+            }
+        }
+
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         return Files.write(Paths.get(UPLOAD_PATH + RandomString.make(10) + "." + extension), file.getBytes());
     }
