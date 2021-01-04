@@ -232,7 +232,11 @@ public class AttachmentService {
         }
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        return Files.write(Paths.get(UPLOAD_PATH + RandomString.make(10) + "." + extension), file.getBytes());
+        Path filePath = Paths.get(UPLOAD_PATH + RandomString.make(10) + "." + extension);
+
+        Files.copy(file.getInputStream(), filePath);
+
+        return filePath;
     }
 
 

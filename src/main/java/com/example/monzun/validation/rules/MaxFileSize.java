@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = MaxFileSizeValidator.class)
 @Documented
 public @interface MaxFileSize {
-    String message() default "File size exceed max size";
+    String message() default "File size exceed max size. Max size is 800MB";
 
     Class<?>[] groups() default {};
 

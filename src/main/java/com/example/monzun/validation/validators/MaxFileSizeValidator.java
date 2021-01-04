@@ -11,7 +11,7 @@ public class MaxFileSizeValidator implements ConstraintValidator<MaxFileSize, Mu
     @Override
     public boolean isValid(MultipartFile[] files, ConstraintValidatorContext constraintValidatorContext) {
         for (MultipartFile file : files) {
-            long MAX_FILE_SIZE = 838_860_800L;
+            long MAX_FILE_SIZE = 800_000_000L;
 
             if (file.getSize() > MAX_FILE_SIZE) {
                 return false;
