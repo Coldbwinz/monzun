@@ -51,7 +51,7 @@ public class StatisticService {
         Tracking tracking = trackingRepository.findById(trackingId)
                 .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + trackingId));
 
-        Startup startup = startupRepository.findById(trackingId)
+        Startup startup = startupRepository.findById(startupId)
                 .orElseThrow(() -> new EntityNotFoundException("Startup not found id " + startupId));
 
         if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
