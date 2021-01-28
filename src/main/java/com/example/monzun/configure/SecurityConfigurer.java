@@ -49,6 +49,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter implements 
                         "/api/auth/login",
                         "/api/me/savePassword",
                         "/api/me/resetPassword",
+                        "/api/attachment/download/**",
                         "/swagger-resources/**",
                         "/swagger-ui.html",
                         "/v2/api-docs",

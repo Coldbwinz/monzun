@@ -110,7 +110,7 @@ public class AttachmentController extends BaseRestController {
                     allowableValues = "true, false",
                     value = "Флаг принудительной загрузки.Если параметр передан true - загрузка происходит сразу"
             )
-            @RequestParam boolean forceDownload,
+            @RequestParam(value = "forceDownload", required = false, defaultValue = "false") boolean forceDownload,
             @ApiParam(
                     required = true,
                     value = "UUID файла для загрузки"
