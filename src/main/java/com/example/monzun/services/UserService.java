@@ -2,6 +2,7 @@ package com.example.monzun.services;
 
 import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.User;
+import com.example.monzun.exception.UniqueUserEmailException;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.MeRequest;
@@ -38,7 +39,7 @@ public class UserService {
      * @param request параметры пользователя
      * @return User
      */
-    public User update(Long id, MeRequest request) {
+    public User update(Long id, MeRequest request) throws UniqueUserEmailException {
         User user = getUser(id);
 
         user.setName(request.getName());
@@ -48,6 +49,10 @@ public class UserService {
         if (request.getAvatarId() != null) {
             Optional<Attachment> possibleLogo = attachmentRepository.findById(request.getAvatarId());
             possibleLogo.ifPresent(user::setLogo);
+        }
+
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UniqueUserEmailException();
         }
 
         if (request.getPassword() != null) {

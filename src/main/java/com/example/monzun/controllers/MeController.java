@@ -4,6 +4,7 @@ import com.example.monzun.dto.UserDTO;
 import com.example.monzun.entities.Mail;
 import com.example.monzun.entities.User;
 import com.example.monzun.exception.NoAuthUserException;
+import com.example.monzun.exception.UniqueUserEmailException;
 import com.example.monzun.repositories.PasswordResetTokenRepository;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.MeRequest;
@@ -97,13 +98,16 @@ public class MeController extends BaseRestController {
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editMe(
             @ApiParam
-            @Valid MeRequest request) {
+            @Valid @RequestBody MeRequest request) {
         try {
             User updatedUser = userService.update(getAuthUser().getId(), request);
 
             return ResponseEntity.ok(new UserDTO(updatedUser));
         } catch (NoAuthUserException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (UniqueUserEmailException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(this.getErrorMessage("email", "existing email"));
         }
     }
 
@@ -189,7 +193,7 @@ public class MeController extends BaseRestController {
     })
     @PostMapping(value = "/savePassword", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> savePassword(
-            @ApiParam @Valid PasswordChangeRequest passwordChangeRequest) {
+            @ApiParam @Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
         boolean result = passwordResetTokenService.isValidPasswordResetToken(passwordChangeRequest.getToken());
 
         if (!result) {

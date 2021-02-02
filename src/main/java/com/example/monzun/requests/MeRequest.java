@@ -1,14 +1,12 @@
 package com.example.monzun.requests;
 
 import com.example.monzun.validation.rules.ExistsAttachment;
-import com.example.monzun.validation.rules.UniqueUserEmail;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -17,11 +15,10 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MeRequest {
-    @NotNull
+    @NotNull(message = "name is required")
     @ApiModelProperty(required = true)
     private String name;
-    @UniqueUserEmail
-    @NotNull
+    @NotNull(message = "email is required")
     @ApiModelProperty(required = true)
     private String email;
     @Pattern(
@@ -31,6 +28,5 @@ public class MeRequest {
     private String phone;
     @ExistsAttachment
     private Long avatarId;
-    @Min(6)
     private String password;
 }
