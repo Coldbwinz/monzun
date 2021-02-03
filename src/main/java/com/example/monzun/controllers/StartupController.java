@@ -128,8 +128,9 @@ public class StartupController extends BaseRestController {
             return ResponseEntity.notFound().build();
         } catch (NoAuthUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (StartupCreateNotAllowedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (StartupCreateNotAllowedException | StartupAccessNotAllowedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(this.getErrorMessage("forbidden", e.getMessage()));
         }
     }
 }
