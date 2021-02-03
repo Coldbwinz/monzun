@@ -133,6 +133,10 @@ public class StartupService {
 
         Startup startup = new Startup();
 
+        if (startupRepository.findByName(request.getName()).isPresent()) {
+            throw new IllegalStateException("Name already used");
+        }
+
         setStartupFields(request, startup);
         startup.setCreatedAt(LocalDateTime.now());
         startup.setOwner(owner);

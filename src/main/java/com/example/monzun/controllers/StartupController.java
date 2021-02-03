@@ -96,6 +96,8 @@ public class StartupController extends BaseRestController {
     public ResponseEntity<?> create(@ApiParam @Valid @RequestBody StartupRequest request) {
         try {
             return ResponseEntity.ok(new StartupDTO(startupService.create(request, getAuthUser())));
+        } catch (IllegalStateException e) {
+           return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(getErrorMessage("name", e.getMessage()));
         } catch (NoAuthUserException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (StartupCreateNotAllowedException e) {
