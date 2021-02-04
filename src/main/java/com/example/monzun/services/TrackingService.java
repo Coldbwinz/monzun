@@ -72,12 +72,7 @@ public class TrackingService {
         Tracking tracking = trackingRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + id));
 
-        if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
-            if (!trackingRepository.getStartupTrackings(user).contains(tracking)) {
-                throw new TrackingAccessNotAllowedException(tracking, user);
-            }
-
-        } else if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
+        if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
             if (!trackingRepository.getTrackerTrackings(user).contains(tracking)) {
                 throw new TrackingAccessNotAllowedException(tracking, user);
             }
