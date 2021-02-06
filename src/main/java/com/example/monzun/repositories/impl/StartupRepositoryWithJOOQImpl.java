@@ -2,6 +2,7 @@ package com.example.monzun.repositories.impl;
 
 import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.Startup;
+import com.example.monzun.entities.Tracking;
 import com.example.monzun.entities.User;
 import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import com.example.monzun.repositories.StartupRepositoryWithJOOQ;
@@ -27,6 +28,21 @@ public class StartupRepositoryWithJOOQImpl implements StartupRepositoryWithJOOQ 
                 "ON st.startup_id = s.startup_id " +
                 "AND st.tracker_id =" + user.getId() + " " +
                 "AND st.tracking_id = t.tracking_id"
+        ).into(Startup.class);
+    }
+
+    @Override
+    public List<Startup> getTrackerStartupsOnTracking(User user, Tracking tracking) {
+        return jooq.fetch("" +
+                "SELECT DISTINCT(s.*) " +
+                "FROM startups AS s " +
+                "JOIN trackings AS t " +
+                "ON t.is_active = TRUE " +
+                "JOIN startup_trackings AS st " +
+                "ON st.startup_id = s.startup_id " +
+                "AND st.tracker_id =" + user.getId() + " " +
+                "AND st.tracking_id = t.tracking_id" + " " +
+                "AND st.tracking_id =" + tracking.getId()
         ).into(Startup.class);
     }
 
