@@ -11,7 +11,7 @@ import lombok.Setter;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -30,5 +30,5 @@ public class TaskRequest {
     @ApiModelProperty(required = true)
     private String name;
     private String description;
-    private LocalDateTime deadlineAt;
+    private LocalDate deadlineAt;
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class Task implements Serializable {
     @Column(name = "description")
     private String description;
     @Column(name = "deadline_at")
-    private LocalDateTime deadlineAt;
+    private LocalDate deadlineAt;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
