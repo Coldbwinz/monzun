@@ -42,7 +42,7 @@ public class UserService {
     public User create(MeRequest request) throws UniqueUserEmailException {
         User user = setUserFields(request, new User());
         user.setRole(RoleEnum.STARTUP.getRole());
-
+        userRepository.saveAndFlush(user);
         return user;
     }
 
