@@ -2,6 +2,7 @@ package com.example.monzun.services;
 
 import com.example.monzun.entities.Attachment;
 import com.example.monzun.entities.User;
+import com.example.monzun.enums.RoleEnum;
 import com.example.monzun.exception.UniqueUserEmailException;
 import com.example.monzun.repositories.AttachmentRepository;
 import com.example.monzun.repositories.UserRepository;
@@ -35,6 +36,20 @@ public class UserService {
     /**
      * Обновление авторизованного пользователя
      *
+     * @param request параметры пользователя
+     * @return User
+     */
+    public User create(MeRequest request) throws UniqueUserEmailException {
+        User user = setUserFields(request, new User());
+        user.setRole(RoleEnum.STARTUP.getRole());
+
+        return user;
+    }
+
+
+    /**
+     * Обновление авторизованного пользователя
+     *
      * @param id      ID пользователя
      * @param request параметры пользователя
      * @return User
@@ -42,6 +57,30 @@ public class UserService {
     public User update(Long id, MeRequest request) throws UniqueUserEmailException {
         User user = getUser(id);
 
+        return setUserFields(request, user);
+    }
+
+    /**
+     * Изменение пароля пользователя
+     *
+     * @param id       ID пользователя
+     * @param password пароль
+     */
+    public void changePassword(Long id, String password) {
+        User user = getUser(id);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.saveAndFlush(user);
+    }
+
+
+    /**
+     *
+     * @param request - данные с формы
+     * @param user - пользователь
+     * @return DTO
+     */
+    private User setUserFields(MeRequest request, User user) {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
@@ -65,18 +104,6 @@ public class UserService {
         return user;
     }
 
-    /**
-     * Изменение пароля пользователя
-     *
-     * @param id       ID пользователя
-     * @param password пароль
-     */
-    public void changePassword(Long id, String password) {
-        User user = getUser(id);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.saveAndFlush(user);
-    }
 
     /**
      * Получение пользователя по ID

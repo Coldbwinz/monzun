@@ -7,8 +7,10 @@ import com.example.monzun.entities.User;
 import com.example.monzun.enums.RoleEnum;
 import com.example.monzun.repositories.UserRepository;
 import com.example.monzun.requests.AuthRequest;
+import com.example.monzun.requests.MeRequest;
 import com.example.monzun.security.JwtUtil;
 import com.example.monzun.services.MyUserDetailsService;
+import com.example.monzun.services.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -38,17 +40,20 @@ public class LoginController extends BaseRestController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final MyUserDetailsService myUserDetailsService;
+    private final UserService userService;
     private final JwtUtil jwtTokenUtil;
 
     public LoginController(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
             MyUserDetailsService myUserDetailsService,
-            JwtUtil jwtTokenUtil
+            JwtUtil jwtTokenUtil,
+            UserService userService
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.myUserDetailsService = myUserDetailsService;
+        this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
@@ -103,5 +108,28 @@ public class LoginController extends BaseRestController {
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new AuthUserDTO(jwt, new UserDTO(user)));
+    }
+
+
+    /**
+     * Регистрация пользователя
+     *
+     * @param request данные
+     * @return JSON
+     */
+    @ApiOperation(
+            value = "Регистрация",
+            response = UserDTO.class
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Успешно", response = UserDTO.class),
+            @ApiResponse(code = 422, message = "Неверные данные")
+    })
+    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> register(
+            @ApiParam(value = "Данные для регистрации", required = true)
+            @Valid @RequestBody MeRequest request) {
+        User user = userService.create(request);
+        return ResponseEntity.ok(new UserDTO(user));
     }
 }
