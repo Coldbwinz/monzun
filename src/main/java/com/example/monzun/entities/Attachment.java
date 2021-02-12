@@ -32,7 +32,7 @@ public class Attachment {
     private String filename;
     @Column(name = "polytable_type")
     private String polytableType;
-    @Column(name = "polytable_id", insertable = false, updatable = false)
+    @Column(name = "polytable_id", updatable = false)
     private Long polytableId;
     @Column(name = "original_filename")
     private String originalFilename;

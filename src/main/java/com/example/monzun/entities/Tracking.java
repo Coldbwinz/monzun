@@ -40,7 +40,7 @@ public class Tracking {
     private LocalDateTime endedAt;
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-    @Column(name = "updated_at", insertable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
