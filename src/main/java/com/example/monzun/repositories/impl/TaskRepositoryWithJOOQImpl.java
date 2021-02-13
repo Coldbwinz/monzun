@@ -21,7 +21,7 @@ public class TaskRepositoryWithJOOQImpl implements TaskRepositoryWithJOOQ {
                 "SELECT DISTINCT(a.*) " +
                         "FROM attachments AS a " +
                         "WHERE a.polytable_id = " + task.getId() + " " +
-                        "AND a.polytable_type = '" + AttachmentPolytableTypeConstants.WEEK_REPORT.getType() + "'")
+                        "AND a.polytable_type = '" + AttachmentPolytableTypeConstants.TASK.getType() + "'")
                 .into(Attachment.class);
     }
 }
