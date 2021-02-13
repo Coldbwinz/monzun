@@ -139,7 +139,7 @@ public class WeekReportService {
         weekReport.setTracking(tracking);
         weekReport.setStartup(startup);
         weekReport.setOwner(user);
-        weekReport.setWeek(tracking.getCurrentWeek());
+        weekReport.setWeek(weekReportRequest.getWeek());
         weekReport.setEstimate(weekReportRequest.getEstimate());
         weekReport.setComment(weekReportRequest.getComment());
         weekReport.setCreatedAt(LocalDateTime.now());
@@ -231,11 +231,12 @@ public class WeekReportService {
                 : Collections.emptyList();
 
         try {
+            weekReportRepository.saveAndFlush(weekReport);
+
             transactionTemplate.executeWithoutResult(exec -> {
                 if (!attachments.isEmpty()) {
                     attachmentService.saveWeekReportFiles(weekReport, attachments);
                 }
-                weekReportRepository.save(weekReport);
             });
         } catch (Exception e) {
             if (!attachments.isEmpty()) {

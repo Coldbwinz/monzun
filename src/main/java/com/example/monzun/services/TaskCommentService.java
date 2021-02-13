@@ -195,11 +195,11 @@ public class TaskCommentService {
                 : Collections.emptyList();
 
         try {
+            taskCommentRepository.saveAndFlush(taskComment);
             transactionTemplate.executeWithoutResult(exec -> {
                 if (!attachments.isEmpty()) {
                     attachmentService.saveTaskCommentFiles(taskComment, attachments);
                 }
-                taskCommentRepository.save(taskComment);
             });
         } catch (Exception e) {
             if (!attachments.isEmpty()) {

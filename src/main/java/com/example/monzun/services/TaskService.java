@@ -245,11 +245,11 @@ public class TaskService {
                 : Collections.emptyList();
 
         try {
+            taskRepository.saveAndFlush(task);
             transactionTemplate.executeWithoutResult(exec -> {
                 if (!attachments.isEmpty()) {
                     attachmentService.saveTaskFiles(task, attachments);
                 }
-                taskRepository.save(task);
             });
         } catch (Exception e) {
             if (!attachments.isEmpty()) {
