@@ -128,7 +128,7 @@ public class WeekReportService {
         }
 
         if (weekReportRepository.existsByTrackingAndStartupAndWeek(tracking,startup,weekReportRequest.getWeek())) {
-            throw new ValidationException("Report for week " + weekReportRequest.getWeek() + "currently created ");
+            throw new ValidationException("Report for week " + weekReportRequest.getWeek() + " currently created ");
         }
 
         //Валидация переданной недели

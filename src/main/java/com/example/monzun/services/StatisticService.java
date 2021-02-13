@@ -87,8 +87,10 @@ public class StatisticService {
 
             if (!report.isPresent()) {
                 weekStats.put("reportId", null);
+                weekStats.put("estimate", null);
             } else {
                 weekStats.put("reportId", report.get().getId());
+                weekStats.put("estimate", report.get().getEstimate());
             }
 
             weeksStats.add(weekStats);

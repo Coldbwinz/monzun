@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import javax.validation.ValidationException;
 
 @Validated
@@ -65,7 +66,7 @@ public class WeekReportController extends BaseRestController {
     public ResponseEntity<?> create(
             @ApiParam(required = true, value = "ID набора") @PathVariable Long trackingId,
             @ApiParam(required = true, value = "ID стартапа") @PathVariable Long startupId,
-            @ApiParam @RequestBody WeekReportRequest weekReportRequest
+            @ApiParam @Valid @RequestBody WeekReportRequest weekReportRequest
     ) {
         try {
             return ResponseEntity.ok()
