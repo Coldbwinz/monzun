@@ -66,8 +66,7 @@ public class StatisticService {
             throw new AccessDeniedException("Not allowed for this user");
         }
 
-        List<WeekReport> weekReportList = weekReportRepository
-                .getWeekReportByTrackingAndStartupAndWeek(tracking, startup, tracking.getCurrentWeek());
+        List<WeekReport> weekReportList = weekReportRepository.getWeekReportByTrackingAndStartup(tracking, startup);
 
         if (weekReportList.isEmpty()) {
             return Collections.emptyMap();
@@ -77,10 +76,21 @@ public class StatisticService {
         Float avgEstimate = (float) weekReportList.stream().mapToInt(WeekReport::getEstimate).sum() / weekReportList.size();
         ArrayList<Map<String, Number>> weeksStats = new ArrayList<>();
 
-        for (WeekReport weekReport : weekReportList) {
+        for (int weekNumber = 1; weekNumber <= tracking.getCurrentWeek(); weekNumber++) {
             Map<String, Number> weekStats = new HashMap<>();
-            weekStats.put("weekNumber", weekReport.getWeek());
-            weekStats.put("reportId", weekReport.getId());
+            weekStats.put("weekNumber", weekNumber);
+
+            int finalWeekNumber = weekNumber;
+            Optional<WeekReport> report = weekReportList.stream()
+                    .filter(weekReport -> weekReport.getWeek().equals(finalWeekNumber))
+                    .findFirst();
+
+            if (!report.isPresent()) {
+                weekStats.put("reportId", null);
+            } else {
+                weekStats.put("reportId", report.get().getId());
+            }
+
             weeksStats.add(weekStats);
         }
 

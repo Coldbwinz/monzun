@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface WeekReportRepositoryWithJOOQ {
     List<Attachment> getWeekReportAttachments(WeekReport weekReport);
-    List<WeekReport> getWeekReportByTrackingAndStartupAndWeek(Tracking tracking, Startup startup, Integer week);
+    List<WeekReport> getWeekReportByTrackingAndStartup(Tracking tracking, Startup startup);
 }

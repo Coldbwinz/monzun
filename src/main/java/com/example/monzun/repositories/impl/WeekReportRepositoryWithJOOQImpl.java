@@ -28,13 +28,12 @@ public class WeekReportRepositoryWithJOOQImpl implements WeekReportRepositoryWit
     }
 
     @Override
-    public List<WeekReport> getWeekReportByTrackingAndStartupAndWeek(Tracking tracking, Startup startup, Integer week) {
+    public List<WeekReport> getWeekReportByTrackingAndStartup(Tracking tracking, Startup startup) {
         return jooq.fetch(
                 "SELECT DISTINCT * " +
                         "FROM week_reports " +
                         "WHERE tracking_id = " + tracking.getId() + " " +
                         "AND startup_id = " + startup.getId() + " " +
-                        "AND week BETWEEN 1 AND " + week + " " +
                         "ORDER BY week")
                 .into(WeekReport.class);
     }
