@@ -69,7 +69,9 @@ public class StatisticService {
         List<WeekReport> weekReportList = weekReportRepository.getWeekReportByTrackingAndStartup(tracking, startup);
 
         Map<String, Object> statistic = new HashMap<>();
-        Float avgEstimate = (float) weekReportList.stream().mapToInt(WeekReport::getEstimate).sum() / weekReportList.size();
+        Float avgEstimate = !weekReportList.isEmpty()
+                ? (float) weekReportList.stream().mapToInt(WeekReport::getEstimate).sum() / weekReportList.size()
+                : 0;
         ArrayList<Map<String, Number>> weeksStats = new ArrayList<>();
 
         for (int weekNumber = 1; weekNumber <= tracking.getCurrentWeek(); weekNumber++) {
