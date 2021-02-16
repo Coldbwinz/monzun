@@ -49,7 +49,7 @@ public class Startup {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "startup_trackings",
             joinColumns = @JoinColumn(name = "startup_id"),

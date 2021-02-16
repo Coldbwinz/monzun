@@ -15,6 +15,7 @@ import com.example.monzun.repositories.TrackingRequestRepository;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,16 +81,24 @@ public class TrackingRequestService {
      * @throws TrackingAlreadyStartedException  попытка запись на набор, который уже начался
      */
     public TrackingRequest create(Long trackingId, Long startupId, User user)
-            throws EntityNotFoundException, StartupAccessNotAllowedException, TrackingAlreadyStartedException {
+            throws EntityNotFoundException, StartupAccessNotAllowedException,
+            TrackingAlreadyStartedException, ValidationException {
         Startup startup = checkPresenceAndGetStartup(startupId);
         if (!startup.getOwner().equals(user)) {
             throw new StartupAccessNotAllowedException(startup, user);
         }
 
         Tracking tracking = checkPresenceAndGetTracking(trackingId);
+
+        if (trackingRequestRepository.findByStartupAndTracking(startup, tracking).isPresent()) {
+            throw new ValidationException("Tracking request for this startup already created: startup id "+ startupId);
+        }
+
         if (LocalDateTime.now().isAfter(tracking.getStartedAt())) {
             throw new TrackingAlreadyStartedException();
         }
+
+
 
         TrackingRequest trackingRequest = new TrackingRequest();
         trackingRequest.setStartup(startup);

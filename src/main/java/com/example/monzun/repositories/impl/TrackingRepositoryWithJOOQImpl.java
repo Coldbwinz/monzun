@@ -17,12 +17,12 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
     @Override
     public List<Tracking> getTrackerTrackings(User user) {
         return jooq.fetch("" +
-                "SELECT DISTINCT(t.*) " +
+                "SELECT DISTINCT(t.*), a.* " +
                 "FROM trackings AS t " +
                 "JOIN startup_trackings AS st " +
                 "ON st.tracker_id = " + user.getId() +
                 "JOIN attachments AS a " +
-                "ON a.id = t.logo_id" +
+                "ON a.attachment_id = t.logo_id " +
                 " ORDER BY t.is_active, t.started_at DESC"
         ).into(Tracking.class);
     }
@@ -30,10 +30,10 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
     @Override
     public List<Tracking> getStartupTrackings(User user) {
         return jooq.fetch("" +
-                "SELECT DISTINCT(t.*) " +
+                "SELECT DISTINCT(t.*), logo.* " +
                 "FROM trackings AS t " +
-                "JOIN attachments AS a " +
-                "ON a.id = t.logo_id" +
+                "JOIN attachments AS logo " +
+                "ON logo.attachment_id = t.logo_id " +
                 "JOIN startups AS s " +
                 "ON s.owner_id = "+ user.getId() + " " +
                 "JOIN startup_trackings AS st " +

@@ -28,8 +28,8 @@ public class Tracking {
     private Long id;
     @Column(name = "name", unique = true, nullable = false)
     private String name;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "logo_id", referencedColumnName = "attachment_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "logo_id")
     private Attachment logo;
     private String description;
     @Column(name = "is_active")
@@ -42,7 +42,7 @@ public class Tracking {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "startup_trackings",
             joinColumns = @JoinColumn(name = "tracking_id"),

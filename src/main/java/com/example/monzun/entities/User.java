@@ -47,7 +47,7 @@ public class User {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @OneToMany(targetEntity = PasswordResetToken.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = PasswordResetToken.class, mappedBy = "user", cascade = CascadeType.ALL)
     private List<PasswordResetToken> passwordResetTokens;
 
     @Override
