@@ -28,7 +28,7 @@ public class Tracking {
     private Long id;
     @Column(name = "name", unique = true, nullable = false)
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "logo_id", referencedColumnName = "attachment_id")
     private Attachment logo;
     private String description;

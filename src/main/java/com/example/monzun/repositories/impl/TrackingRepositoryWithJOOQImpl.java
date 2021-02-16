@@ -21,6 +21,8 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
                 "FROM trackings AS t " +
                 "JOIN startup_trackings AS st " +
                 "ON st.tracker_id = " + user.getId() +
+                "JOIN attachments AS a " +
+                "ON a.id = t.logo_id" +
                 " ORDER BY t.is_active, t.started_at DESC"
         ).into(Tracking.class);
     }
@@ -30,6 +32,8 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
         return jooq.fetch("" +
                 "SELECT DISTINCT(t.*) " +
                 "FROM trackings AS t " +
+                "JOIN attachments AS a " +
+                "ON a.id = t.logo_id" +
                 "JOIN startups AS s " +
                 "ON s.owner_id = "+ user.getId() + " " +
                 "JOIN startup_trackings AS st " +

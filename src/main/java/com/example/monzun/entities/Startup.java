@@ -25,7 +25,7 @@ public class Startup {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "startups_seq")
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "logo_id")
     private Attachment logo;
     @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
