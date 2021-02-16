@@ -28,7 +28,7 @@ public class Startup {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "logo_id")
     private Attachment logo;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "owner_id")
     private User owner;
     @Column(name = "name", nullable = false)
@@ -49,7 +49,7 @@ public class Startup {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "startup_trackings",
             joinColumns = @JoinColumn(name = "startup_id"),

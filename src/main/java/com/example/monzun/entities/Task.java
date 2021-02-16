@@ -26,16 +26,16 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "tasks_seq")
     private Long id;
-    @ManyToOne(targetEntity = Tracking.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Tracking.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "tracking_id", nullable = false)
     private Tracking tracking;
-    @ManyToOne(targetEntity = Startup.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Startup.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "startup_id", nullable = false)
     private Startup startup;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-    @ManyToOne(targetEntity = TaskStatus.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = TaskStatus.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "task_status_id", nullable = false)
     private TaskStatus taskStatus;
     @Column(name = "name", nullable = false)

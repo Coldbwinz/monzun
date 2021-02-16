@@ -25,10 +25,10 @@ public class TaskComment implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
             generator = "task_comments_seq")
     private Long id;
-    @ManyToOne(targetEntity = Task.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Task.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     @Column(name = "text", nullable = false)
