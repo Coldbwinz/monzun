@@ -8,6 +8,7 @@ import com.example.monzun.enums.RoleEnum;
 import com.example.monzun.exception.TrackingAccessNotAllowedException;
 import com.example.monzun.repositories.StartupRepository;
 import com.example.monzun.repositories.TrackingRepository;
+import com.example.monzun.repositories.impl.TrackingRepositoryWithJOOQImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +24,17 @@ public class TrackingService {
     private final ModelMapper modelMapper;
     private final TrackingRepository trackingRepository;
     private final StartupRepository startupRepository;
+    private final TrackingRepositoryWithJOOQImpl trackingRepositoryWithJOOQ;
 
     public TrackingService(
             ModelMapper modelMapper,
             TrackingRepository trackingRepository,
+            TrackingRepositoryWithJOOQImpl trackingRepositoryWithJOOQ,
             StartupRepository startupRepository
     ) {
         this.modelMapper = modelMapper;
         this.trackingRepository = trackingRepository;
+        this.trackingRepositoryWithJOOQ = trackingRepositoryWithJOOQ;
         this.startupRepository = startupRepository;
     }
 
@@ -43,13 +47,13 @@ public class TrackingService {
     public List<TrackingListDTO> getTrackings(User user) {
         if (user.getRole().equals(RoleEnum.STARTUP.getRole())) {
             return trackingRepository
-                    .getStartupTrackings(user)
+                    .findAllById(trackingRepositoryWithJOOQ.getStartupTrackingIds(user))
                     .stream()
                     .map(this::convertToListDto)
                     .collect(Collectors.toList());
         } else if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
             return trackingRepository
-                    .getTrackerTrackings(user)
+                    .findAllById(trackingRepositoryWithJOOQ.getTrackerTrackingIds(user))
                     .stream()
                     .map(this::convertToListDto)
                     .collect(Collectors.toList());
@@ -73,7 +77,8 @@ public class TrackingService {
                 .orElseThrow(() -> new EntityNotFoundException("Tracking not found id " + id));
 
         if (user.getRole().equals(RoleEnum.TRACKER.getRole())) {
-            if (!trackingRepository.getTrackerTrackings(user).contains(tracking)) {
+            List<Tracking> trackings = trackingRepository.findAllById(trackingRepositoryWithJOOQ.getTrackerTrackingIds(user));
+            if (!trackings.contains(tracking)) {
                 throw new TrackingAccessNotAllowedException(tracking, user);
             }
             tracking.setStartups(startupRepository.getTrackerStartupsOnTracking(user, tracking));

@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface TrackingRepository extends JpaRepository<Tracking, Long>, TrackingRepositoryWithJOOQ {
+public interface TrackingRepository extends JpaRepository<Tracking, Long> {
     List<Tracking> findByActiveTrueAndStartedAtAfter(LocalDateTime startedAt);
 }

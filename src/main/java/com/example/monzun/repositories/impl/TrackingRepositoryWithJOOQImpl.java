@@ -1,45 +1,36 @@
 package com.example.monzun.repositories.impl;
 
-import com.example.monzun.entities.Tracking;
 import com.example.monzun.entities.User;
 import com.example.monzun.repositories.TrackingRepositoryWithJOOQ;
-import org.jooq.DSLContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-
+@Component
 public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOOQ {
-    private final DSLContext jooq;
+    private final JdbcTemplate jdbcTemplate;
 
-    public TrackingRepositoryWithJOOQImpl(DSLContext jooq) {
-        this.jooq = jooq;
+    public TrackingRepositoryWithJOOQImpl(
+            JdbcTemplate jdbcTemplate
+    ) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<Tracking> getTrackerTrackings(User user) {
-        return jooq.fetch("" +
-                "SELECT DISTINCT(t.*), a.* " +
+    public Iterable<Long> getTrackerTrackingIds(User user) {
+        return jdbcTemplate.queryForList("SELECT DISTINCT(t.tracking_id) " +
                 "FROM trackings AS t " +
                 "JOIN startup_trackings AS st " +
-                "ON st.tracker_id = " + user.getId() +
-                "JOIN attachments AS a " +
-                "ON a.attachment_id = t.logo_id " +
-                " ORDER BY t.is_active, t.started_at DESC"
-        ).into(Tracking.class);
+                "ON st.tracker_id = " + user.getId(), Long.class);
     }
 
     @Override
-    public List<Tracking> getStartupTrackings(User user) {
-        return jooq.fetch("" +
-                "SELECT DISTINCT(t.*), logo.* " +
+    public Iterable<Long> getStartupTrackingIds(User user) {
+        return jdbcTemplate.queryForList("SELECT DISTINCT(t.tracking_id) " +
                 "FROM trackings AS t " +
-                "JOIN attachments AS logo " +
-                "ON logo.attachment_id = t.logo_id " +
                 "JOIN startups AS s " +
-                "ON s.owner_id = "+ user.getId() + " " +
+                "ON s.owner_id = " + user.getId() + " " +
                 "JOIN startup_trackings AS st " +
                 "ON st.startup_id = s.startup_id " +
-                "AND st.tracking_id = t.tracking_id " +
-                "ORDER BY t.is_active, t.started_at DESC"
-        ).into(Tracking.class);
+                "AND st.tracking_id = t.tracking_id", Long.class);
     }
 }

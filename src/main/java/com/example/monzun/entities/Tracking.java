@@ -29,7 +29,7 @@ public class Tracking {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "logo_id")
+    @JoinColumn(name = "logo_id", referencedColumnName = "attachment_id")
     private Attachment logo;
     private String description;
     @Column(name = "is_active")
