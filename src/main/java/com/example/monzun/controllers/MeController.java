@@ -136,7 +136,7 @@ public class MeController extends BaseRestController {
 
         Map<String, Object> props = new HashMap<>();
         props.put("name", possibleUser.get().getName());
-        props.put("button-url", url);
+        props.put("buttonUrl", url);
         props.put("sign", environment.getProperty("APP_NAME"));
 
         Mail mail = emailService.createMail(possibleUser.get().getEmail(), "Reset password", props);
