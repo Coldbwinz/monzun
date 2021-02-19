@@ -20,7 +20,7 @@ public class TrackingRepositoryWithJOOQImpl implements TrackingRepositoryWithJOO
         return jdbcTemplate.queryForList("SELECT DISTINCT(t.tracking_id) " +
                 "FROM trackings AS t " +
                 "JOIN startup_trackings AS st " +
-                "ON st.tracker_id = " + user.getId(), Long.class);
+                "ON st.tracking_id = t.tracking_id AND st.tracker_id = " + user.getId(), Long.class);
     }
 
     @Override
