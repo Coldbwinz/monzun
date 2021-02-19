@@ -81,7 +81,7 @@ public class TrackingService {
             if (!trackings.contains(tracking)) {
                 throw new TrackingAccessNotAllowedException(tracking, user);
             }
-            tracking.setStartups(startupRepository.getTrackerStartupsOnTracking(user, tracking));
+            tracking.setStartups(startupRepository.findAllById(startupRepository.getTrackerStartupsOnTrackingIds(user, tracking)));
         }
 
         return this.convertToDto(tracking);

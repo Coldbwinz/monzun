@@ -7,14 +7,19 @@ import com.example.monzun.entities.User;
 import com.example.monzun.enums.AttachmentPolytableTypeConstants;
 import com.example.monzun.repositories.StartupRepositoryWithJOOQ;
 import org.jooq.DSLContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
 public class StartupRepositoryWithJOOQImpl implements StartupRepositoryWithJOOQ {
     private final DSLContext jooq;
+    private final JdbcTemplate jdbcTemplate;
 
-    public StartupRepositoryWithJOOQImpl(DSLContext jooq) {
+
+    public StartupRepositoryWithJOOQImpl(DSLContext jooq, JdbcTemplate jdbcTemplate) {
         this.jooq = jooq;
+        this.jdbcTemplate = jdbcTemplate;
+
     }
 
     @Override
@@ -32,9 +37,9 @@ public class StartupRepositoryWithJOOQImpl implements StartupRepositoryWithJOOQ 
     }
 
     @Override
-    public List<Startup> getTrackerStartupsOnTracking(User user, Tracking tracking) {
-        return jooq.fetch("" +
-                "SELECT DISTINCT(s.*) " +
+    public Iterable<Long> getTrackerStartupsOnTrackingIds(User user, Tracking tracking) {
+        return jdbcTemplate.queryForList("" +
+                "SELECT DISTINCT(s.startup_id) " +
                 "FROM startups AS s " +
                 "JOIN trackings AS t " +
                 "ON t.is_active = TRUE " +
@@ -42,8 +47,7 @@ public class StartupRepositoryWithJOOQImpl implements StartupRepositoryWithJOOQ 
                 "ON st.startup_id = s.startup_id " +
                 "AND st.tracker_id =" + user.getId() + " " +
                 "AND st.tracking_id = t.tracking_id" + " " +
-                "AND st.tracking_id =" + tracking.getId()
-        ).into(Startup.class);
+                "AND st.tracking_id =" + tracking.getId(), Long.class);
     }
 
     @Override

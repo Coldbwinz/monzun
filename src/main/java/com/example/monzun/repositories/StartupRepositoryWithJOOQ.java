@@ -9,10 +9,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StartupRepositoryWithJOOQ  {
+public interface StartupRepositoryWithJOOQ {
     List<Startup> getTrackerStartups(User user);
-    List<Startup> getTrackerStartupsOnTracking(User user, Tracking tracking);
+
+    Iterable<Long> getTrackerStartupsOnTrackingIds(User user, Tracking tracking);
+
     List<Startup> getStartupStartups(User user);
+
     List<User> getStartupTrackers(Startup startup);
+
     List<Attachment> getStartupAttachments(Startup startup);
 }
